@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Particle grid — INTUITY</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0b0b0c; --panel:#141416;
+    --paper:#e8e6e1; --paper-dim:rgba(232,230,225,.52); --paper-faint:rgba(232,230,225,.26);
+    --gold:#C9A961; --signal:#FFD94A; --solid:#5ED39B; --learning:#7dd3fc; --shaky:#E86A5C;
+    --line:rgba(232,230,225,.09);
+    --display:'Space Grotesk',system-ui,sans-serif;
+    --body:'DM Sans',system-ui,sans-serif;
+    --mono:'DM Mono',ui-monospace,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--ink); color:var(--paper); font-family:var(--body); padding:clamp(.8rem,2.5vw,1.6rem); min-height:100vh}
+  button{font:inherit; color:inherit; background:none; border:none; cursor:pointer}
+  :focus-visible{outline:2px solid var(--signal); outline-offset:2px}
+
+  header{max-width:1150px; margin:0 auto 1.1rem; display:flex; align-items:flex-end; gap:1rem; flex-wrap:wrap}
+  h1{font-family:var(--display); font-weight:700; font-size:.9rem; letter-spacing:.3em; text-transform:uppercase; color:var(--gold)}
+  .tag{font-family:var(--mono); font-size:.6rem; letter-spacing:.16em; text-transform:uppercase; color:var(--paper-faint)}
+  .spacer{flex:1}
+  .btn{font-family:var(--mono); font-size:.66rem; padding:.42rem .9rem; border:1px solid var(--line); color:var(--paper-dim); transition:.15s}
+  .btn:hover{border-color:var(--gold); color:var(--gold)}
+  .btn.solid{background:var(--signal); color:var(--ink); border-color:var(--signal)}
+
+  .wrap{max-width:1150px; margin:0 auto; display:grid; grid-template-columns:1fr 280px; gap:1.1rem; align-items:start}
+  @media(max-width:900px){.wrap{grid-template-columns:1fr}}
+
+  .panel{background:var(--panel); border:1px solid var(--line); padding:1rem}
+  .panelhead{font-family:var(--mono); font-size:.58rem; letter-spacing:.2em; text-transform:uppercase; color:var(--paper-faint); margin-bottom:.75rem}
+
+  /* grid */
+  .gridscroll{overflow-x:auto}
+  table{border-collapse:collapse; font-family:var(--mono); font-size:.6rem}
+  th{font-weight:400; color:var(--paper-faint); letter-spacing:.1em; text-transform:uppercase; padding:.3rem .35rem; white-space:nowrap}
+  th.rowhead{text-align:right; color:var(--paper-dim); position:sticky; left:0; background:var(--panel)}
+  td{padding:2px}
+  .cell{width:26px; height:26px; border:1px solid var(--line); display:block; position:relative; transition:transform .12s}
+  .cell.exists{cursor:pointer}
+  .cell.exists:hover{transform:scale(1.22); z-index:3; border-color:var(--paper)}
+  .cell.void{border-color:transparent; background:rgba(232,230,225,.02)}
+  .cell.unseen{background:rgba(232,230,225,.07)}
+  .cell.learning{background:var(--learning); opacity:.55}
+  .cell.shaky{background:var(--shaky); opacity:.75}
+  .cell.solid{background:var(--solid)}
+  .cell.due::after{content:''; position:absolute; inset:auto 2px 2px auto; width:4px; height:4px; border-radius:50%; background:var(--signal)}
+  th.colhead{writing-mode:vertical-rl; transform:rotate(180deg); height:64px; vertical-align:bottom}
+  th.colhead.hot{color:var(--gold)}
+
+  .legend{display:flex; gap:.9rem; flex-wrap:wrap; margin-top:.9rem; font-family:var(--mono); font-size:.58rem; color:var(--paper-faint)}
+  .key{display:flex; align-items:center; gap:.35rem}
+  .swatch{width:9px; height:9px; display:inline-block}
+
+  /* side */
+  .stat{display:flex; justify-content:space-between; font-family:var(--mono); font-size:.66rem; padding:.3rem 0; border-bottom:1px solid rgba(232,230,225,.05)}
+  .stat b{font-weight:400; color:var(--gold)}
+  .queue{margin-top:.2rem}
+  .qitem{display:flex; align-items:baseline; gap:.5rem; padding:.34rem 0; border-bottom:1px solid rgba(232,230,225,.05); font-size:.76rem}
+  .qitem .n{font-family:var(--mono); font-size:.58rem; color:var(--paper-faint); width:1.1rem}
+  .qitem .ph{font-family:var(--display); font-weight:500; letter-spacing:.04em; text-transform:uppercase; font-size:.72rem}
+  .qitem .st{margin-left:auto; font-family:var(--mono); font-size:.55rem; color:var(--paper-faint)}
+  .fam-a{color:var(--paper)} .fam-b{color:var(--gold)}
+
+  .sense{margin-top:.9rem; padding-top:.75rem; border-top:1px solid var(--line); font-size:.74rem; line-height:1.6; color:var(--paper-dim); min-height:5.5rem}
+  .sense b{font-family:var(--display); color:var(--signal); font-weight:500; letter-spacing:.05em; display:block; margin-bottom:.25rem; font-size:.82rem}
+  .sense em{font-style:normal; color:var(--paper-faint)}
+  .note{font-size:.7rem; color:var(--paper-faint); line-height:1.6; margin-top:.9rem; max-width:1150px; margin-left:auto; margin-right:auto}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Particle grid</h1>
+  <span class="tag" id="storeTag"></span>
+  <span class="spacer"></span>
+  <button class="btn" id="seedBtn">Simulate 3 weeks</button>
+  <button class="btn" id="sessionBtn">Run a session</button>
+  <button class="btn solid" id="exportBtn">Export data</button>
+  <button class="btn" id="resetBtn">Reset</button>
+</header>
+
+<div class="wrap">
+  <section class="panel">
+    <div class="panelhead">Verb × particle — every cell that exists is a phrase you can own</div>
+    <div class="gridscroll"><table id="grid"></table></div>
+    <div class="legend">
+      <span class="key"><i class="swatch cell unseen"></i> unseen</span>
+      <span class="key"><i class="swatch cell learning"></i> learning</span>
+      <span class="key"><i class="swatch cell shaky"></i> shaky</span>
+      <span class="key"><i class="swatch cell solid"></i> solid</span>
+      <span class="key"><i class="swatch" style="background:var(--signal);border-radius:50%"></i> due now</span>
+    </div>
+  </section>
+
+  <aside>
+    <section class="panel">
+      <div class="panelhead">Where you are</div>
+      <div id="stats"></div>
+      <div class="sense" id="sense">
+        <b>Hover a cell</b>
+        <em>Columns are particles. Read down one and the shared logic shows up — that's the pattern the grid is built to expose.</em>
+      </div>
+    </section>
+
+    <section class="panel" style="margin-top:1.1rem">
+      <div class="panelhead">Up next — due queue</div>
+      <div class="queue" id="queue"></div>
+      <p class="note" style="margin-top:.7rem">Consecutive items never share a verb. Colour alternates so you can see the interleaving.</p>
+    </section>
+  </aside>
+</div>
+
+<p class="note">Demo data. The grid, the queue and the stats all read from the same store the four INTUITY modes and both games would write to.</p>
+
+<script src="intuity-progress.js"></script>
+<script>
+/* ---------------------------------------------------------------------------
+   The particle is the organising axis. Rows are verbs, columns are particles,
+   a filled cell is a real phrase. Gaps are as informative as hits — they show
+   which combinations English doesn't make.
+--------------------------------------------------------------------------- */
+const PARTICLES = ['up','off','out','on','in','down','over','back','into','through','after','around','away','for'];
+
+const PARTICLE_SENSE = {
+  up:      'completion, upward, to a finish',
+  off:     'separation, departure, cancellation',
+  out:     'emergence, exclusion, to exhaustion',
+  on:      'continuation, contact, activation',
+  in:      'entry, inclusion, submission',
+  down:    'reduction, recording, defeat',
+  over:    'transfer, repetition, inspection',
+  back:    'return, restraint, retaliation',
+  into:    'entry, collision, investigation',
+  through: 'completion by traversal, endurance',
+  after:   'pursuit, resemblance',
+  around:  'aimlessness, circumvention',
+  away:    'removal, persistence at a distance',
+  for:     'purpose, seeking, compensation'
+};
+
+const VERBS = {
+  take: {up:'to start a hobby', off:'to leave the ground; to become popular', out:'to remove; to invite somewhere', on:'to accept a responsibility', in:'to absorb; to deceive', down:'to write; to dismantle', over:'to assume control', back:'to retract a statement', after:'to resemble a relative', through:'to guide someone step by step', around:'to show someone a place', away:'to remove'},
+  get:  {up:'to rise from bed', off:'to leave a vehicle', out:'to leave; to become known', on:'to make progress; to board', in:'to enter; to be accepted', down:'to depress; to swallow', over:'to recover from', back:'to return', into:'to become interested in', through:'to endure; to reach by phone', around:'to circumvent', away:'to escape', for:'to be understood as'},
+  put:  {up:'to erect; to accommodate', off:'to postpone', out:'to extinguish; to inconvenience', on:'to wear; to stage', in:'to install; to submit', down:'to criticise; to set down', back:'to delay', through:'to connect by phone', away:'to store', for:'to nominate'},
+  look: {up:'to search a reference; to improve', out:'to be careful', into:'to investigate', after:'to care for', around:'to explore your options', through:'to examine quickly', over:'to review', back:'to remember', down:'to feel superior to', for:'to seek'},
+  come: {up:'to arise unexpectedly', off:'to succeed; to detach', out:'to be revealed; to be published', on:'to hurry; to begin', in:'to enter; to finish a race', down:'to descend; to reduce', over:'to visit; to affect', back:'to return', into:'to inherit', around:'to change your mind', across:'to find by chance', through:'to deliver as promised'},
+  go:   {up:'to rise', off:'to explode; to spoil', out:'to leave socially; to be extinguished', on:'to continue', in:'to enter', down:'to decrease; to be recorded', over:'to review', back:'to return', into:'to examine in detail', through:'to endure; to examine', after:'to pursue', around:'to circulate', away:'to depart', for:'to choose'},
+  bring:{up:'to raise a topic; to raise a child', off:'to achieve something difficult', out:'to release; to reveal a quality', on:'to cause', in:'to introduce; to earn', down:'to reduce; to topple', over:'to bring to a place', back:'to return; to revive', about:'to cause to happen', around:'to persuade'},
+  call: {up:'to telephone; to conscript', off:'to cancel', out:'to summon; to challenge publicly', on:'to visit; to appeal to', in:'to summon for help', back:'to return a call', for:'to require; to collect'},
+  run:  {up:'to accumulate a bill', off:'to leave hurriedly; to print', out:'to be exhausted', on:'to continue; to be powered by', in:'to break in a new machine', down:'to criticise; to lose power', over:'to hit with a vehicle; to review', into:'to meet by chance', through:'to rehearse; to squander', after:'to chase', away:'to flee'},
+  carry:{up:'',  off:'to win; to manage successfully', out:'to perform a task', on:'to continue', over:'to postpone to a later time', back:'to remind of the past', through:'to sustain someone', away:'to overwhelm emotionally', for:''}
+};
+
+const P = INTUITY.Progress.init();
+const ALL_IDS = [];
+Object.entries(VERBS).forEach(([v, ps]) =>
+  Object.entries(ps).forEach(([p, m]) => { if (m && PARTICLES.includes(p)) ALL_IDS.push(P.id(v, p)); })
+);
+
+const meaningOf = id => (VERBS[P.verbOf(id)] || {})[P.particleOf(id)] || '';
+const phraseOf  = id => (P.verbOf(id) + ' ' + P.particleOf(id)).toUpperCase();
+const $ = i => document.getElementById(i);
+
+/* ---------- render ---------- */
+function renderGrid(){
+  const t = $('grid');
+  let html = '<tr><th></th>' + PARTICLES.map(p=>{
+    const m = P.particleMastery(p, ALL_IDS);
+    const hot = m.total && m.solid / m.total >= .5 ? ' hot' : '';
+    return `<th class="colhead${hot}" data-particle="${p}">${p}</th>`;
+  }).join('') + '</tr>';
+
+  Object.keys(VERBS).forEach(v=>{
+    html += `<tr><th class="rowhead">${v}</th>` + PARTICLES.map(p=>{
+      const m = VERBS[v][p];
+      if(!m) return '<td><span class="cell void"></span></td>';
+      const id = P.id(v,p);
+      const due = P.isDue(id) ? ' due' : '';
+      return `<td><span class="cell exists ${P.state(id)}${due}" data-id="${id}"></span></td>`;
+    }).join('') + '</tr>';
+  });
+  t.innerHTML = html;
+
+  t.querySelectorAll('.cell.exists').forEach(c=>{
+    c.addEventListener('mouseenter', ()=>describeItem(c.dataset.id));
+  });
+  t.querySelectorAll('.colhead').forEach(h=>{
+    h.addEventListener('mouseenter', ()=>describeParticle(h.dataset.particle));
+  });
+}
+
+function describeItem(id){
+  const r = P.record_(id);
+  const bits = r ? `${r.reps} reps · ${r.lapses} lapses · box ${r.box}${r.ema? ' · '+(r.ema/1000).toFixed(1)+'s':''}` : 'not yet seen';
+  $('sense').innerHTML = `<b>${phraseOf(id)}</b>${meaningOf(id)}<br><em>${bits}</em>`;
+}
+
+function describeParticle(p){
+  const m = P.particleMastery(p, ALL_IDS);
+  $('sense').innerHTML = `<b>–${p}</b>${PARTICLE_SENSE[p]||''}<br><em>${m.solid} of ${m.total} solid across the column</em>`;
+}
+
+function renderStats(){
+  const o = P.overall(ALL_IDS);
+  $('stats').innerHTML = [
+    ['phrases met', `${o.touched} / ${o.total}`],
+    ['solid', o.solid],
+    ['shaky', o.shaky],
+    ['accuracy', o.accuracy + '%'],
+    ['mean retrieval', o.meanLatency ? (o.meanLatency/1000).toFixed(1)+'s' : '—'],
+    ['day streak', o.dayStreak]
+  ].map(([k,v])=>`<div class="stat"><span>${k}</span><b>${v}</b></div>`).join('');
+}
+
+function renderQueue(){
+  const q = P.due(8, {pool: ALL_IDS, mixFamilies:true});
+  if(!q.length){ $('queue').innerHTML = '<p class="note">Nothing due. Simulate some study to fill the queue.</p>'; return; }
+  let lastFam = null, flip = false;
+  $('queue').innerHTML = q.map((id,i)=>{
+    const fam = P.verbOf(id);
+    if(fam !== lastFam){ flip = !flip; lastFam = fam; }
+    return `<div class="qitem"><span class="n">${i+1}</span>
+      <span class="ph ${flip?'fam-a':'fam-b'}">${phraseOf(id)}</span>
+      <span class="st">${P.state(id)}</span></div>`;
+  }).join('');
+}
+
+function paint(){ renderGrid(); renderStats(); renderQueue(); }
+
+/* ---------- simulation ---------- */
+/* Fakes a plausible history so the grid has something to show: some particles
+   worked more than others, accuracy improving with reps, latency falling. */
+function simulate(days){
+  const now = Date.now();
+  const favoured = ['up','off','out','on','back'];
+  for(let d = days; d > 0; d--){
+    const pool = ALL_IDS.filter(id => favoured.includes(P.particleOf(id)) || Math.random() < .35);
+    const todays = pool.sort(()=>Math.random()-.5).slice(0, 10 + (Math.random()*8|0));
+    todays.forEach(id=>{
+      const r = P.record_(id);
+      const skill = Math.min(.92, .45 + (r ? r.reps * .09 : 0));
+      const ok = Math.random() < skill;
+      const ms = 4200 - (r ? Math.min(2200, r.reps * 280) : 0) + (Math.random()*900|0);
+      P.record(id, ok, {mode:'sim', latencyMs: ms, chosen: ok ? null : randomNeighbour(id)});
+      /* backdate so intervals actually elapse */
+      const rec = P.record_(id);
+      rec.last = now - d*864e5; rec.due = rec.last + 1;
+    });
+  }
+  P._save(); paint();
+}
+
+/* a wrong answer that shares the verb or the particle — the realistic error */
+function randomNeighbour(id){
+  const v = P.verbOf(id), p = P.particleOf(id);
+  const near = ALL_IDS.filter(x => x !== id && (P.verbOf(x) === v || P.particleOf(x) === p));
+  return near.length ? near[(Math.random()*near.length)|0] : null;
+}
+
+$('seedBtn').onclick    = ()=>simulate(21);
+$('sessionBtn').onclick = ()=>{
+  P.due(12,{pool:ALL_IDS}).forEach(id=>{
+    const r = P.record_(id);
+    const ok = Math.random() < Math.min(.94,.5 + (r?r.reps*.08:0));
+    P.record(id, ok, {mode:'sim', latencyMs: 1800 + (Math.random()*1600|0), chosen: ok?null:randomNeighbour(id)});
+  });
+  paint();
+};
+$('exportBtn').onclick = ()=>P.download('intuity-pilot');
+$('resetBtn').onclick  = ()=>{ P.reset(); paint(); };
+
+$('storeTag').textContent = P.persistent ? 'saving locally' : 'memory only — storage unavailable here';
+paint();
+</script>
+</body>
+</html>
