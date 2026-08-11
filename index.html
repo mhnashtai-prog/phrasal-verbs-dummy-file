@@ -63,15 +63,20 @@
 
   .sectiontitle{font-family:var(--mono); font-size:.6rem; letter-spacing:.2em; text-transform:uppercase; color:rgba(232,230,225,.45); margin:.6rem 0 .5rem; padding-left:.1rem}
 
-  .badgeshelf{display:flex; flex-wrap:wrap; gap:.4rem; margin-bottom:1.1rem}
-  .badge{
-    display:flex; align-items:center; gap:.35rem; padding:.28rem .55rem .28rem .4rem;
-    border-radius:999px; border:1px solid var(--line); font-family:var(--mono); font-size:.62rem;
-    background:rgba(255,255,255,.02); color:var(--paper-faint);
+  .verbgrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(108px,1fr)); gap:.5rem; margin-bottom:1.3rem}
+  .verbcard{
+    position:relative; cursor:pointer; text-align:left; border:1px solid var(--line); border-radius:10px;
+    padding:.65rem .7rem; background:rgba(255,255,255,.02); overflow:hidden;
+    display:flex; flex-direction:column; gap:.25rem; min-height:64px;
+    transition:transform .12s, border-color .12s, background .12s;
   }
-  .badge .chip{width:9px; height:9px; border-radius:50%; background:currentColor; opacity:.25}
-  .badge.earned{color:var(--paper); border-color:rgba(255,255,255,.18)}
-  .badge.earned .chip{opacity:1; box-shadow:0 0 8px currentColor}
+  .verbcard::before{content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--vcolor,var(--gold)); opacity:.55}
+  .verbcard:hover{transform:translateY(-2px); border-color:rgba(255,255,255,.28); background:rgba(255,255,255,.045)}
+  .verbcard .vname{font-family:var(--display); font-weight:700; font-size:.82rem; letter-spacing:.02em}
+  .verbcard .vmeta{font-family:var(--mono); font-size:.56rem; color:var(--paper-faint); letter-spacing:.03em}
+  .verbcard .vstars{font-size:.62rem; letter-spacing:.1em; color:var(--signal); min-height:.9em}
+  .verbcard.mastered{border-color:rgba(255,217,74,.4); background:rgba(255,217,74,.05)}
+  .verbcard.mastered .vname{color:var(--signal)}
 
   .mixgrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(148px,1fr)); gap:.6rem}
   .mixcard{
@@ -179,14 +184,10 @@
     <div class="stagebar" id="stagebar"></div>
     <div class="stagecaption" id="stagecaption"></div>
 
-    <div class="sectiontitle">Mastered families</div>
-    <div class="badgeshelf" id="badgeshelf"></div>
+    <div class="sectiontitle">Practice a verb</div>
+    <div class="verbgrid" id="verbgrid"></div>
 
-    <div class="sectiontitle">Study by verb</div>
-    <div class="mixgrid" id="mixgrid"></div>
-
-    <div class="sectiontitle">Exam revision — every verb shuffled together</div>
-    <p class="sub" style="text-align:left; margin:-.2rem 0 .6rem; max-width:520px">For general review rather than one verb at a time. Each set pulls a little from every family.</p>
+    <div class="sectiontitle">Revision — every verb shuffled together</div>
     <div class="mixgrid" id="revgrid"></div>
 
     <div class="trialcard locked" id="trialcard">
@@ -218,7 +219,7 @@
 
   <!-- ============ SUMMARY SCREEN ============ -->
   <section class="screen" id="summary">
-    <div class="sumeyebrow" id="sumEyebrow">MIX 1</div>
+    <div class="sumeyebrow" id="sumEyebrow">PRACTICE</div>
     <div class="sumverdict" id="sumVerdict">Cleared</div>
     <div class="sumstars" id="sumStars"></div>
     <div class="sumstats">
@@ -272,11 +273,8 @@ DATA.verbs.forEach(v => {
 });
 const VERB_FAMILIES = DATA.verbs.map(v => ({ id: v.id, label: v.label, color: v.color, count: v.items.length }));
 
-/* ---------- chunk into mixes ---------- */
-const MIX_SIZE = 15;
-const MIXES = [];
-for (let i = 0; i < FULL_POOL.length; i += MIX_SIZE) MIXES.push(FULL_POOL.slice(i, i + MIX_SIZE));
-const N_MIXES = MIXES.length;
+/* ---------- verb families are the practice unit ---------- */
+const N_VERBS = VERB_FAMILIES.length;
 
 /* ---------- exam revision: round-robin across every family ---------- */
 /* Study-by-verb mixes are chunked in family order, so a kid working through
@@ -307,17 +305,17 @@ const TRIAL_THRESHOLD = 0.75;   // accuracy needed to earn the Crown
 
 /* ---------- stage ladder ---------- */
 const STAGES = [
-  { key:'spark', label:'Spark', color:'var(--s0)', glow:'var(--s0-glow)', desc:'You can spot a phrasal verb when you see one. First mixes cleared.' },
-  { key:'ember', label:'Ember', color:'var(--s1)', glow:'var(--s1-glow)', desc:'The patterns are starting to stick. Keep clearing mixes.' },
+  { key:'spark', label:'Spark', color:'var(--s0)', glow:'var(--s0-glow)', desc:'You can spot a phrasal verb when you see one. First verbs cleared.' },
+  { key:'ember', label:'Ember', color:'var(--s1)', glow:'var(--s1-glow)', desc:'The patterns are starting to stick. Keep clearing verbs.' },
   { key:'flame', label:'Flame', color:'var(--s2)', glow:'var(--s2-glow)', desc:'Recall is getting fast. Halfway through the full set.' },
   { key:'blaze', label:'Blaze', color:'var(--s3)', glow:'var(--s3-glow)', desc:'Nearly every family in the set is in play. One push to the trial.' },
-  { key:'crown', label:'Crown', color:'var(--s4)', glow:'var(--s4-glow)', desc:'Every mix cleared and the Final Trial passed. Full mastery.' },
+  { key:'crown', label:'Crown', color:'var(--s4)', glow:'var(--s4-glow)', desc:'Every verb cleared and the Final Trial passed. Full mastery.' },
 ];
 function stageThresholds(){
-  const s2 = Math.max(1, Math.ceil(N_MIXES * 0.2));
-  const s3 = Math.max(s2 + 1, Math.ceil(N_MIXES * 0.45));
-  const s4 = Math.max(s3 + 1, Math.ceil(N_MIXES * 0.75));
-  return [0, s2, s3, s4, N_MIXES];
+  const s2 = Math.max(1, Math.ceil(N_VERBS * 0.2));
+  const s3 = Math.max(s2 + 1, Math.ceil(N_VERBS * 0.45));
+  const s4 = Math.max(s3 + 1, Math.ceil(N_VERBS * 0.75));
+  return [0, s2, s3, s4, N_VERBS];
 }
 const THRESH = stageThresholds();
 
@@ -331,11 +329,12 @@ function makeStore(key){
   };
 }
 const store = makeStore('incoming.progress.v2');
-let progress = store.read() || { mixResults:{}, revResults:{}, phraseStats:{}, trialPassed:false, trialBest:0, seenStage:0 };
+let progress = store.read() || { verbResults:{}, revResults:{}, phraseStats:{}, trialPassed:false, trialBest:0, seenStage:0 };
 if (!progress.revResults) progress.revResults = {};
+if (!progress.verbResults) progress.verbResults = {}; // players upgrading from the old per-mix version start fresh here
 function saveProgress(){ store.write(progress); }
 function pstat(p){ if(!progress.phraseStats[p]) progress.phraseStats[p] = { hits:0, misses:0 }; return progress.phraseStats[p]; }
-function clearedCount(){ return Object.values(progress.mixResults).filter(r => r.cleared).length; }
+function clearedCount(){ return Object.values(progress.verbResults).filter(r => r.cleared).length; }
 function currentStageIndex(){
   const c = clearedCount();
   if (c >= THRESH[4] && progress.trialPassed) return 4;
@@ -399,39 +398,32 @@ function renderMenu(){
     const nextThresh = THRESH[stageIdx+1];
     const remain = Math.max(0, nextThresh - cleared);
     if (stageIdx === 3) {
-      cap.innerHTML = cleared >= N_MIXES ? `All mixes cleared — <b>Final Trial</b> unlocked below.` : `Clear <b>${remain}</b> more mix${remain===1?'':'es'} to unlock the Final Trial.`;
+      cap.innerHTML = cleared >= N_VERBS ? `All verbs cleared — <b>Final Trial</b> unlocked below.` : `Clear <b>${remain}</b> more verb${remain===1?'':'s'} to unlock the Final Trial.`;
     } else {
-      cap.innerHTML = `Clear <b>${remain}</b> more mix${remain===1?'':'es'} to reach <b>${STAGES[stageIdx+1].label}</b>.`;
+      cap.innerHTML = `Clear <b>${remain}</b> more verb${remain===1?'':'s'} to reach <b>${STAGES[stageIdx+1].label}</b>.`;
     }
   } else {
     cap.innerHTML = `<b>Crown</b> reached. Full mastery of the set.`;
   }
 
-  /* badge shelf */
-  const shelf = $('badgeshelf'); shelf.innerHTML = '';
+  /* verb grid — this is the whole "study by verb" surface now: tap a verb to
+     drill just its particles, and the card itself carries the mastery signal
+     that used to live in a separate badge shelf above it. */
+  const vgrid = $('verbgrid'); vgrid.innerHTML = '';
   VERB_FAMILIES.forEach(f => {
-    const earned = familyMastered(f.id);
-    const b = document.createElement('div');
-    b.className = 'badge' + (earned ? ' earned' : '');
-    b.innerHTML = `<span class="chip"></span><span>${f.label}</span>`;
-    shelf.appendChild(b);
-  });
-
-  /* mix grid */
-  const grid = $('mixgrid'); grid.innerHTML = '';
-  MIXES.forEach((mix, i) => {
-    const res = progress.mixResults[i];
+    const res = progress.verbResults[f.id];
+    const mastered = familyMastered(f.id);
     const card = document.createElement('div');
-    card.className = 'mixcard unlocked';
+    card.className = 'verbcard' + (mastered ? ' mastered' : '');
+    card.style.setProperty('--vcolor', f.color);
     const stars = res ? starsFor(res.bestAccuracy) : '';
     card.innerHTML = `
-      <span class="num">MIX ${i+1}</span>
-      <span class="name">${mix.length} phrases</span>
-      <span class="stars">${stars}</span>
-      ${res ? `<span class="pct">best ${Math.round(res.bestAccuracy*100)}%</span>` : ''}
+      <span class="vname">${f.label}</span>
+      <span class="vmeta">${f.count} phrase${f.count===1?'':'s'}${res ? ` · best ${Math.round(res.bestAccuracy*100)}%` : ''}</span>
+      <span class="vstars">${stars}</span>
     `;
-    card.addEventListener('click', () => startMix(i));
-    grid.appendChild(card);
+    card.addEventListener('click', () => startVerb(f.id));
+    vgrid.appendChild(card);
   });
 
   /* revision grid */
@@ -452,7 +444,7 @@ function renderMenu(){
   });
 
   /* trial card */
-  const allCleared = cleared >= N_MIXES;
+  const allCleared = cleared >= N_VERBS;
   const tc = $('trialcard');
   tc.classList.toggle('locked', !allCleared);
   $('trialIconPath').setAttribute('fill', allCleared ? (progress.trialPassed ? 'var(--s4)' : 'var(--gold)') : '#5a5a52');
@@ -461,7 +453,7 @@ function renderMenu(){
     : (allCleared ? 'Final Trial — ready' : 'Final Trial — locked');
   $('trialDesc').textContent = progress.trialPassed
     ? `Best score ${Math.round(progress.trialBest*100)}%. Replay any time.`
-    : (allCleared ? `The hardest phrases from every mix, mixed together. Score ${Math.round(TRIAL_THRESHOLD*100)}%+ to earn the Crown.` : 'Clear every mix to unlock the Crown trial.');
+    : (allCleared ? `The hardest phrases from every verb, mixed together. Score ${Math.round(TRIAL_THRESHOLD*100)}%+ to earn the Crown.` : 'Clear every verb to unlock the Crown trial.');
   tc.onclick = allCleared ? startTrial : null;
 }
 
@@ -477,8 +469,10 @@ function starsFor(acc){
 ====================================================================== */
 let round = null; // holds everything for the current round
 
-function startMix(i){
-  beginRound({ mode:'mix', index:i, pool: MIXES[i], label: `MIX ${i+1} · match this meaning` });
+function startVerb(verbId){
+  const family = VERB_FAMILIES.find(f => f.id === verbId);
+  const pool = FULL_POOL.filter(it => it.verb === verbId);
+  beginRound({ mode:'verb', index:verbId, pool, label: `${family.label} · match this meaning` });
 }
 function startRevision(i){
   beginRound({ mode:'revision', index:i, pool: REVISION_MIXES[i], label: `REVISION ${i+1} · match this meaning` });
@@ -799,10 +793,10 @@ function endRound(){
   const stageBefore = currentStageIndex();
 
   let cleared = false;
-  if (round.mode === 'mix') {
+  if (round.mode === 'verb') {
     cleared = accuracy >= CLEAR_THRESHOLD;
-    const prev = progress.mixResults[round.index];
-    progress.mixResults[round.index] = { cleared: cleared || (prev && prev.cleared), bestAccuracy: Math.max(accuracy, prev ? prev.bestAccuracy : 0), coverage: coveragePct };
+    const prev = progress.verbResults[round.index];
+    progress.verbResults[round.index] = { cleared: cleared || (prev && prev.cleared), bestAccuracy: Math.max(accuracy, prev ? prev.bestAccuracy : 0), coverage: coveragePct };
     saveProgress();
   } else if (round.mode === 'revision') {
     // Revision rounds still feed the global phraseStats (so badges and the
@@ -829,7 +823,7 @@ function endRound(){
 
 function renderSummary(res){
   showScreen('summary');
-  $('sumEyebrow').textContent = round.mode === 'trial' ? 'FINAL TRIAL' : (round.mode === 'revision' ? `REVISION ${round.index+1}` : `MIX ${round.index+1}`);
+  $('sumEyebrow').textContent = round.mode === 'trial' ? 'FINAL TRIAL' : (round.mode === 'revision' ? `REVISION ${round.index+1}` : VERB_FAMILIES.find(f => f.id === round.index).label);
   const v = $('sumVerdict');
   if (round.mode === 'trial') {
     v.textContent = res.cleared ? 'Crown earned' : 'Not yet';
@@ -838,15 +832,15 @@ function renderSummary(res){
     v.textContent = res.cleared ? 'Cleared' : 'Keep training';
     v.className = 'sumverdict ' + (res.cleared ? 'cleared' : 'short');
   }
-  $('sumStars').textContent = (round.mode === 'mix' || round.mode === 'revision') ? starsFor(res.accuracy) : '';
+  $('sumStars').textContent = (round.mode === 'verb' || round.mode === 'revision') ? starsFor(res.accuracy) : '';
   $('sumHits').textContent = round.hits;
   $('sumMiss').textContent = round.misses;
   $('sumAcc').textContent = Math.round(res.accuracy*100) + '%';
 
   const note = $('sumNote');
-  if (round.mode === 'mix') {
+  if (round.mode === 'verb') {
     note.textContent = res.cleared
-      ? `Coverage: you met ${Math.round(res.coveragePct*100)}% of this mix's phrases at least once.`
+      ? `Coverage: you met ${Math.round(res.coveragePct*100)}% of this verb's phrases at least once.`
       : `Needs ${Math.round(CLEAR_THRESHOLD*100)}% accuracy to clear. You reached ${Math.round(res.accuracy*100)}%.`;
   } else if (round.mode === 'revision') {
     note.textContent = res.cleared
@@ -861,7 +855,7 @@ function renderSummary(res){
   $('sumRetry').onclick = () => {
     if (round.mode === 'trial') startTrial();
     else if (round.mode === 'revision') startRevision(round.index);
-    else startMix(round.index);
+    else startVerb(round.index);
   };
   $('sumNext').onclick = () => { renderMenu(); };
 }
@@ -884,7 +878,7 @@ $('backBtn').addEventListener('click', () => {
 });
 
 /* ---------- boot ---------- */
-$('subline').textContent = `${DATA.level} phrasal verbs · ${N_MIXES} mixes · ${FULL_POOL.length} phrases · 5 stages to Crown`;
+$('subline').textContent = `${DATA.level} phrasal verbs · ${N_VERBS} verbs · ${FULL_POOL.length} phrases · 5 stages to Crown`;
 renderMenu();
 </script>
 </body>
