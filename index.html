@@ -1,666 +1,2167 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Incoming — Phrasal Verbs</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,600;1,600&family=Bungee&family=Caveat:wght@700&family=Archivo+Black&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --ink:#0b0b0c; --panel:#141416; --panel2:#1b1b1e;
-    --paper:#e8e6e1; --paper-dim:rgba(232,230,225,.55); --paper-faint:rgba(232,230,225,.24);
-    --gold:#C9A961; --signal:#FFD94A; --clear:#5ED39B; --wrong:#E86A5C;
-    --line:rgba(232,230,225,.1);
-    --display:'Space Grotesk',system-ui,sans-serif;
-    --body:'DM Sans',system-ui,sans-serif;
-    --mono:'DM Mono',ui-monospace,monospace;
-    /* stage palette — proximity ladder, cool ember to hot gold */
-    --s0:#cdbf8e; --s0-glow:rgba(205,191,142,.5);
-    --s1:#e8935a; --s1-glow:rgba(232,147,90,.55);
-    --s2:#ff7a45; --s2-glow:rgba(255,122,69,.6);
-    --s3:#ff4d4d; --s3-glow:rgba(255,77,77,.65);
-    --s4:#ffd94a; --s4-glow:rgba(255,217,74,.8);
-  }
-  *{margin:0;padding:0;box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    font-family:var(--body); background:radial-gradient(ellipse at 50% 25%, #17171a 0%, var(--ink) 72%);
-    color:var(--paper); display:flex; flex-direction:column; padding:clamp(.6rem,2vw,1.1rem);
-    overflow:hidden;
-  }
-  button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>INTUITY — Phrasal Verbs</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root { --gold: #C9A961; --gold-glow: rgba(201,169,97,0.4); --mode-accent: #FFD94A; --mode-accent-rgb: 255,217,74; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #0d0d0d; }
+    body { font-family: 'DM Sans', sans-serif; color: #e5e5e7; user-select: none; -webkit-user-select: none; }
 
-  header{text-align:center; margin-bottom:.5rem; flex-shrink:0}
-  h1{font-family:var(--display); font-weight:700; font-size:clamp(.78rem,2.2vw,.9rem); letter-spacing:.34em; text-transform:uppercase; color:var(--gold); text-indent:.34em}
-  .sub{font-size:.66rem; color:var(--paper-faint); margin-top:.25rem}
+    /* ── HEADER ── */
+.header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; flex-direction: column; align-items: stretch; gap: .4rem;
+  padding: .5rem 1.25rem .4rem;
+  background: rgba(13,13,13,.88); backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,.06); height: 116px;
+}
 
-  #frame{
-    flex:1; width:100%; max-width:min(96vw,1040px); margin:0 auto; min-height:0;
-    display:flex; flex-direction:column; position:relative; overflow:hidden;
-    background:var(--panel); border:1px solid var(--line); border-radius:14px;
-    box-shadow:0 30px 80px rgba(0,0,0,.7);
-  }
+    /* Row 1 — back link · INTUITY title · balancing spacer */
+    .header-top {
+      display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+    }
+    .header-title { display: flex; flex-direction: column; align-items: center; line-height: 1.1; }
+    .app-title {
+      font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 900;
+      letter-spacing: .22em; color: var(--gold);
+    }
+    .app-subtitle {
+      font-family: 'DM Sans', sans-serif; font-size: .58rem; font-weight: 600;
+      letter-spacing: .16em; text-transform: uppercase; color: rgba(255,255,255,.32);
+      margin-top: .1rem;
+    }
+    .back-link { justify-self: start; }
+    .header-spacer { justify-self: end; }
 
-  .screen{position:absolute; inset:0; display:none; flex-direction:column; min-height:0}
-  .screen.active{display:flex}
+    .back-link {
+      text-decoration: none; font-family: 'Space Grotesk', sans-serif;
+      font-size: .6rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+      color: rgba(255,255,255,.3); transition: color .2s; white-space: nowrap; flex-shrink: 0;
+    }
+    .back-link:hover { color: rgba(255,255,255,.7); }
 
-  /* ============ MENU ============ */
-  #menu{overflow-y:auto; padding:1.1rem 1.2rem 1.6rem}
-  .stagebar{display:flex; align-items:center; justify-content:center; gap:clamp(.4rem,2vw,1.1rem); padding:.7rem 0 1rem}
-  .stagenode{display:flex; flex-direction:column; align-items:center; gap:.3rem; width:56px}
-  .stagenode .dot{width:30px; height:30px; display:flex; align-items:center; justify-content:center; position:relative}
-  .stagenode svg{width:100%; height:100%}
-  .stagenode .lbl{font-family:var(--mono); font-size:.52rem; letter-spacing:.08em; text-transform:uppercase; color:var(--paper-faint)}
-  .stagenode.done .lbl{color:var(--paper-dim)}
-  .stagenode.current .lbl{color:var(--signal); font-weight:500}
-  .stagelink{width:clamp(10px,3vw,26px); height:1px; background:var(--line); margin-top:-18px; flex-shrink:0}
-  .stagelink.done{background:var(--gold)}
+    /* Row 3 — verb tabs, its own scrollable strip below the mode row */
+    .verb-tabs {
+      display: flex; align-items: center; justify-content: center;
+      gap: .28rem; overflow-x: auto; padding: 0 .5rem; scrollbar-width: none;
+    }
+    .verb-tabs::-webkit-scrollbar { display: none; }
+    .vtab {
+      font-family: 'Space Grotesk', sans-serif; font-size: .56rem; font-weight: 700;
+      letter-spacing: .08em; text-transform: uppercase;
+      padding: .28rem .72rem; border-radius: 999px; border: 1px solid transparent;
+      background: transparent; color: rgba(255,255,255,.3); cursor: pointer;
+      transition: all .2s; white-space: nowrap; flex-shrink: 0;
+    }
+    .vtab:hover { color: rgba(255,255,255,.7); border-color: rgba(255,255,255,.15); }
+    .vtab.active {
+      color: var(--verb-color, var(--gold));
+      border-color: var(--verb-color, var(--gold));
+      background: rgba(var(--verb-rgb, 201,169,97), .12);
+    }
+    .vtab.locked { opacity: .3; cursor: not-allowed; pointer-events: none; }
+    /* Score indicator dots on verb tabs */
+    .vtab::after {
+      content: ''; display: inline-block; width: 5px; height: 5px;
+      border-radius: 50%; margin-left: .4rem; vertical-align: middle;
+      opacity: 0; transition: opacity .3s;
+    }
+    .vtab.score-perfect::after { background: #4DC98A; opacity: 1; box-shadow: 0 0 6px rgba(77,201,138,.6); }
+    .vtab.score-great::after   { background: #7dd3fc; opacity: 1; }
+    .vtab.score-ok::after      { background: #fb923c; opacity: 1; }
+    .vtab.score-poor::after    { background: #E05555; opacity: 1; }
 
-  .stagecaption{text-align:center; font-family:var(--mono); font-size:.66rem; color:var(--paper-dim); margin-bottom:1rem}
-  .stagecaption b{color:var(--signal)}
+    /* Row 2 — mode selector: minimal, single-tone segmented control */
+    .mode-selector {
+      display: flex; justify-content: center; align-self: center;
+      background: rgba(28,28,30,.6); backdrop-filter: blur(40px);
+      border-radius: 999px; border: 1px solid rgba(201,169,97,.2); overflow: hidden;
+    }
+    .mode-btn {
+      position: relative;
+      display: flex; align-items: center; gap: .4rem;
+      font-family: 'Space Grotesk', sans-serif; font-size: .66rem; font-weight: 600;
+      letter-spacing: .04em; text-transform: uppercase;
+      padding: .5rem 1.05rem; border-radius: 0; border: none;
+      border-right: 1px solid rgba(84,84,88,.2);
+      background: transparent; color: #636366; cursor: pointer;
+      transition: background .2s ease, color .2s ease;
+    }
+    .mode-btn:last-child { border-right: none; }
+    .mode-btn:hover { color: #9ca3af; background: rgba(201,169,97,.1); }
+    .mode-icon {
+      font-size: .82rem; line-height: 1; display: inline-flex;
+      opacity: .55; transition: opacity .2s ease; flex-shrink: 0;
+    }
+    .mode-badge {
+      font-size: .58rem; font-weight: 600;
+      color: rgba(255,255,255,.28);
+      font-variant-numeric: tabular-nums; transition: color .2s ease;
+    }
 
-  .sectiontitle{font-family:var(--mono); font-size:.6rem; letter-spacing:.2em; text-transform:uppercase; color:rgba(232,230,225,.45); margin:.6rem 0 .5rem; padding-left:.1rem}
+    .mode-btn.active {
+      background: rgba(201,169,97,.15);
+      color: #C9A961;
+    }
+    .mode-btn.active .mode-icon { opacity: .9; }
+    .mode-btn.active .mode-badge { color: rgba(201,169,97,.6); }
 
-  .verbgrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(108px,1fr)); gap:.5rem; margin-bottom:1.3rem}
-  .verbcard{
-    position:relative; cursor:pointer; text-align:left; border:1px solid var(--line); border-radius:10px;
-    padding:.65rem .7rem; background:rgba(255,255,255,.02); overflow:hidden;
-    display:flex; flex-direction:column; gap:.25rem; min-height:64px;
-    transition:transform .12s, border-color .12s, background .12s;
-  }
-  .verbcard::before{content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--vcolor,var(--gold)); opacity:.55}
-  .verbcard:hover{transform:translateY(-2px); border-color:rgba(255,255,255,.28); background:rgba(255,255,255,.045)}
-  .verbcard .vname{font-family:var(--display); font-weight:700; font-size:.82rem; letter-spacing:.02em}
-  .verbcard .vmeta{font-family:var(--mono); font-size:.56rem; color:var(--paper-faint); letter-spacing:.03em}
-  .verbcard .vstars{font-size:.62rem; letter-spacing:.1em; color:var(--signal); min-height:.9em}
-  .verbcard.mastered{border-color:rgba(255,217,74,.4); background:rgba(255,217,74,.05)}
-  .verbcard.mastered .vname{color:var(--signal)}
+    .mode-btn[data-mode="gap"] .mode-icon { color: inherit; }
 
-  .mixgrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(148px,1fr)); gap:.6rem}
-  .mixcard{
-    position:relative; text-align:left; border:1px solid var(--line); border-radius:10px; padding:.7rem .8rem .6rem;
-    background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0));
-    display:flex; flex-direction:column; gap:.3rem; min-height:84px; transition:transform .12s, border-color .12s;
-  }
-  .mixcard.unlocked{cursor:pointer}
-  .mixcard.unlocked:hover{transform:translateY(-2px); border-color:rgba(255,217,74,.35)}
-  .mixcard.locked{opacity:.38}
-  .mixcard .num{font-family:var(--mono); font-size:.6rem; color:var(--paper-faint); letter-spacing:.1em}
-  .mixcard .name{font-family:var(--display); font-weight:700; font-size:.85rem}
-  .mixcard .stars{font-size:.75rem; letter-spacing:.12em; color:var(--signal); min-height:1em}
-  .mixcard .lock{position:absolute; top:.6rem; right:.6rem; font-size:.8rem; color:var(--paper-faint)}
-  .mixcard .pct{font-family:var(--mono); font-size:.58rem; color:var(--paper-dim)}
+    @media(max-width: 760px){
+      .mode-btn .mode-label { display: none; }
+      .mode-btn { padding: .5rem .6rem .5rem .5rem; gap: .4rem; }
+    }
 
-  .trialcard{
-    margin-top:1rem; border:1px solid rgba(255,217,74,.35); border-radius:12px;
-    padding:1rem 1.1rem; background:radial-gradient(ellipse at 30% 0%, rgba(255,217,74,.08), transparent 70%);
-    display:flex; align-items:center; gap:.9rem; cursor:pointer; transition:transform .12s;
-  }
-  .trialcard:hover{transform:translateY(-2px)}
-  .trialcard.locked{opacity:.4; cursor:default; pointer-events:none}
-  .trialcard .icon{width:34px; height:34px; flex-shrink:0}
-  .trialcard .tt{font-family:var(--display); font-weight:700; font-size:.95rem; color:var(--signal)}
-  .trialcard .td{font-size:.72rem; color:var(--paper-dim); margin-top:.1rem}
+    /* ── STAGE ── */
+    .stage {
+   position: fixed; top: 148px; left: 0; right: 0; bottom: 80px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+     padding: .5rem;
+    }
 
-  /* ============ PLAY ============ */
-  .hud{display:flex; align-items:center; gap:1rem; padding:.65rem .9rem .4rem; font-family:var(--mono); font-size:.68rem; flex-shrink:0}
-  .hud .spacer{flex:1}
-  .hit{color:var(--clear)} .miss{color:var(--wrong)} .streak{color:var(--gold)}
-  .streak.hot{color:var(--signal)}
-  .clock{font-family:var(--mono); font-size:.72rem; padding:.15rem .5rem; border-radius:6px; background:rgba(255,255,255,.04)}
-  .clock.low{color:var(--wrong); background:rgba(232,106,92,.12)}
-  .backbtn{font-family:var(--mono); font-size:.62rem; color:var(--paper-faint); letter-spacing:.05em}
-  .backbtn:hover{color:var(--paper)}
+    /* ── SLIDE CARD ── */
+ .slide-card {
+position: relative; width: 100%; max-width: min(94vw, 1200px);
+  flex: 1;
+  background: linear-gradient(145deg, rgba(28,28,30,.97), rgba(18,18,20,.99));
+  border-radius: 1.25rem; border: 1px solid rgba(201,169,97,.22); overflow: hidden;
+  box-shadow: 0 24px 70px rgba(0,0,0,.8), 0 0 80px rgba(201,169,97,.07);
+  transition: border-color .4s;
+}
 
-  .prompt{margin:.3rem 1rem 0; padding:.7rem 1rem; text-align:center; border-left:2px solid var(--signal); background:rgba(255,217,74,.05); flex-shrink:0}
-  .promptlabel{font-family:var(--mono); font-size:.55rem; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,217,74,.65); margin-bottom:.3rem}
-  .prompttext{font-size:clamp(.85rem,2.2vw,1rem)}
+       .slide-card.match-mode .dot-nav { display: none; }
+        .slide-card.match-mode .slides-container { height: 100%; }
+        .slide-card.match-mode { max-height: none; }
+    .slide-card.match-mode .slide {
+  position: relative;
+  top: auto; left: auto;
+  height: auto;
+  transform: none;
+  opacity: 1;
+  pointer-events: auto;
+}
 
-  .field{position:relative; flex:1; min-height:0; margin:.6rem .6rem 1rem; perspective:600px; overflow:hidden}
-  .field::before{
-    content:''; position:absolute; inset:0; pointer-events:none; z-index:5;
-    background:radial-gradient(ellipse at 50% 40%, transparent 40%, rgba(20,20,22,.9) 100%);
-  }
+    /* ══════════════════ INCOMING (falling-words game mode) ══════════════════ */
+    .slide-card.incoming-mode .dot-nav { display: none; }
+    .slide-card.incoming-mode .slides-container { height: 100%; }
+    .slide-card.incoming-mode .slide {
+      position: relative; top: auto; left: auto; height: auto; min-height: 100%;
+      transform: none; opacity: 1; pointer-events: auto;
+    }
+    .incoming-slide {
+      position: relative; width: 100%; height: 100%;
+      display: flex; flex-direction: column; padding: 1.6rem 1.3rem .6rem;
+    }
+    .incoming-stage-label {
+      position: absolute; top: .85rem; right: 1rem;
+      font-family: 'DM Sans', sans-serif; font-size: .56rem; font-weight: 700;
+      letter-spacing: .14em; text-transform: uppercase; pointer-events: none; z-index: 6; white-space: nowrap;
+    }
+    .incoming-hud {
+      display: flex; align-items: center; justify-content: flex-end; gap: 1rem;
+      font-family: 'Space Grotesk', sans-serif; font-size: .62rem; font-weight: 700;
+      letter-spacing: .08em; text-transform: uppercase; color: rgba(229,229,231,.4);
+      padding: 0 1.6rem .5rem 0; flex-shrink: 0;
+    }
+    .incoming-clock { padding: .18rem .6rem; border-radius: 999px; background: rgba(255,255,255,.05); font-variant-numeric: tabular-nums; }
+    .incoming-clock.low { color: #E05555; background: rgba(224,85,85,.15); }
+    .incoming-streak b { color: var(--mode-accent); }
+    .incoming-streak.hot b { color: #FFD94A; text-shadow: 0 0 8px rgba(255,217,74,.55); }
+    .incoming-prompt {
+      text-align: center; padding: .65rem 1.1rem; margin-bottom: .7rem;
+      border-left: 2px solid var(--mode-accent); background: rgba(var(--mode-accent-rgb),.06); flex-shrink: 0;
+      border-radius: 0 .4rem .4rem 0;
+    }
+    .incoming-prompt-label {
+      font-family: 'Space Grotesk', sans-serif; font-size: .52rem; font-weight: 700;
+      letter-spacing: .2em; text-transform: uppercase; color: var(--mode-accent); opacity: .8; margin-bottom: .3rem;
+    }
+    .incoming-prompt-text { font-family: 'DM Sans', sans-serif; font-size: clamp(.82rem,2vw,1rem); color: #e5e5e7; line-height: 1.5; }
+    .incoming-field { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+    .incoming-field::before {
+      content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 5;
+      background: radial-gradient(ellipse at 50% 40%, transparent 45%, rgba(18,18,20,.85) 100%);
+    }
+    .incoming-word {
+      position: absolute; left: 0; top: 0; font-family: 'Space Grotesk', sans-serif; font-weight: 800;
+      letter-spacing: .02em; text-transform: uppercase; white-space: nowrap; cursor: pointer; user-select: none;
+    }
+    .incoming-word.wrong { color: #E05555 !important; }
+    .incoming-toast {
+      position: absolute; left: 50%; bottom: .9rem; transform: translate(-50%,10px);
+      background: rgba(10,10,10,.95); border: 1px solid rgba(255,255,255,.12); border-left: 2px solid var(--mode-accent);
+      padding: .55rem .85rem; font-size: .74rem; max-width: min(90%,440px); text-align: left; border-radius: .5rem;
+      opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; z-index: 8;
+    }
+    .incoming-toast.show { opacity: 1; transform: translate(-50%,0); }
+    .incoming-toast b { font-family: 'Space Grotesk', sans-serif; color: var(--mode-accent); }
+    .incoming-toast span { color: rgba(229,229,231,.55); }
 
-  .word{position:absolute; left:0; top:0; will-change:transform,opacity,filter; letter-spacing:.01em; white-space:nowrap; cursor:pointer; user-select:none}
-  .word.wrong{color:var(--wrong)!important}
-  .spark{position:absolute; width:5px; height:5px; border-radius:50%; pointer-events:none; z-index:4}
+    /* Top shadow accent — matches verb colour */
+    .slide-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--verb-color, var(--gold)); opacity: .7; transition: background .4s; z-index: 5;
+    }
 
-  .toast{
-    position:absolute; left:50%; bottom:1rem; transform:translate(-50%,10px);
-    background:var(--ink); border:1px solid rgba(232,230,225,.16); border-left:2px solid var(--wrong);
-    padding:.55rem .85rem; font-size:.72rem; max-width:min(90%,440px); text-align:left;
-    opacity:0; transition:opacity .2s, transform .2s; pointer-events:none; z-index:8;
-  }
-  .toast.show{opacity:1; transform:translate(-50%,0)}
-  .toast b{font-family:var(--display); color:var(--wrong)}
-  .toast span{color:var(--paper-dim)}
-  .toast.good{border-left-color:var(--clear)} .toast.good b{color:var(--clear)}
-  .toast.rest{border-left-color:var(--gold)} .toast.rest b{color:var(--gold)}
+    .slides-container { position: relative; width: 100%; height: calc(100% - 54px); overflow: hidden; }
 
-  /* ============ SUMMARY ============ */
-  #summary{align-items:center; justify-content:center; text-align:center; padding:1.5rem; gap:.4rem}
-  .sumeyebrow{font-family:var(--mono); font-size:.62rem; letter-spacing:.2em; text-transform:uppercase; color:var(--paper-faint)}
-  .sumverdict{font-family:var(--display); font-weight:700; font-size:clamp(1.3rem,4vw,1.9rem); margin:.3rem 0}
-  .sumverdict.cleared{color:var(--clear)}
-  .sumverdict.short{color:var(--wrong)}
-  .sumstats{display:flex; gap:1.6rem; margin:.9rem 0 1.2rem; font-family:var(--mono); font-size:.75rem}
-  .sumstats div{display:flex; flex-direction:column; align-items:center; gap:.15rem}
-  .sumstats b{font-family:var(--display); font-size:1.15rem}
-  .sumstars{font-size:1.4rem; letter-spacing:.15em; color:var(--signal); margin-bottom:.3rem; min-height:1.4rem}
-  .sumactions{display:flex; gap:.6rem; margin-top:.4rem}
-  .sumbtn{padding:.55rem 1.1rem; border-radius:8px; font-family:var(--mono); font-size:.68rem; letter-spacing:.05em; border:1px solid var(--line)}
-  .sumbtn.primary{background:var(--signal); color:#20190a; border-color:var(--signal); font-weight:500}
-  .sumbtn:hover{border-color:rgba(255,255,255,.35)}
-  .sumnote{font-size:.68rem; color:var(--paper-faint); margin-top:1rem; max-width:360px}
+    /* ── SLIDE ── */
+    .slide {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 2.5rem 3.5rem; gap: 1.2rem;
+      opacity: 0; transform: translateX(60px);
+      transition: opacity .42s cubic-bezier(.4,0,.2,1), transform .42s cubic-bezier(.4,0,.2,1);
+      pointer-events: none;
+    }
+    .slide.active  { opacity: 1; transform: translateX(0); pointer-events: auto; z-index: 10; }
+    .slide.exit-left { opacity: 0; transform: translateX(-60px); pointer-events: none; }
 
-  /* ============ STAGE-UP OVERLAY ============ */
-  #stageup{position:absolute; inset:0; z-index:20; display:none; align-items:center; justify-content:center; flex-direction:column; text-align:center;
-    background:radial-gradient(ellipse at 50% 45%, rgba(0,0,0,.55), rgba(0,0,0,.92));backdrop-filter:blur(2px); cursor:pointer}
-  #stageup.show{display:flex}
-  #stageup .ic{width:96px; height:96px; margin-bottom:.6rem; filter:drop-shadow(0 0 24px var(--glowcol,rgba(255,217,74,.6)))}
-  #stageup .eyebrow{font-family:var(--mono); font-size:.66rem; letter-spacing:.25em; text-transform:uppercase; color:var(--paper-dim)}
-  #stageup .name{font-family:var(--display); font-weight:700; font-size:clamp(1.8rem,6vw,2.6rem); margin:.15rem 0 .5rem}
-  #stageup .desc{font-size:.78rem; color:var(--paper-dim); max-width:320px}
-  #stageup .tap{font-family:var(--mono); font-size:.6rem; color:var(--paper-faint); margin-top:1.4rem; letter-spacing:.08em}
+    /* ── LEARN MODE ── */
+    .phrase-text {
+      font-family: 'Space Grotesk', sans-serif; font-weight: 800;
+      line-height: 1.25; text-align: center; color: #e5e5e7;
+      text-transform: uppercase; letter-spacing: -.025em;
+      width: 100%;
+    }
+ .phrase-text.size-small  { font-size: clamp(2.6rem, 6.5vw, 4.8rem); }
+.phrase-text.size-medium { font-size: clamp(1.9rem, 5vw, 3.4rem); }
+.phrase-text.size-large  { font-size: clamp(1.4rem, 3.6vw, 2.5rem); }
 
-  @keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-  @keyframes spinSlow{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-</style>
+    .phrase-text .hl {
+      background: linear-gradient(135deg, #C9A961 0%, #FFD700 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; font-weight: 900;
+    }
+    .phrase-text .verb-word {
+      font-weight: 900;
+      color: var(--verb-color, var(--gold));
+      -webkit-text-fill-color: var(--verb-color, var(--gold));
+    }
+    .phrase-text .particle {
+      font-weight: 900; text-decoration: underline;
+      text-underline-offset: 4px; text-decoration-thickness: 2px;
+      color: var(--verb-color, var(--gold));
+      -webkit-text-fill-color: var(--verb-color, var(--gold));
+      transition: filter .25s, opacity .25s;
+    }
+
+    .meaning-text {
+      font-family: 'DM Sans', sans-serif; font-size: clamp(.82rem, 1.7vw, .98rem);
+      line-height: 1.75; color: rgba(229,229,231,.55); text-align: center; max-width: 560px;
+    }
+
+    /* quiz uses .phrase-text + size classes */
+    .quiz-blank {
+      display: inline-block; min-width: 80px; border-bottom: 2px solid var(--mode-accent);
+      color: var(--mode-accent); font-weight: 900;
+      text-align: center; padding: 0 6px; transition: all .3s;
+    }
+    .quiz-blank.revealed { border-bottom-color: transparent; }
+
+    .quiz-opts {
+      display: flex; flex-wrap: wrap; justify-content: center;
+      gap: .4rem; width: 100%; max-width: 520px;
+    }
+    .qopt {
+      font-family: 'Space Grotesk', sans-serif; font-size: .6rem;
+      font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      padding: .38rem .9rem; border-radius: 999px;
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1);
+      color: rgba(229,229,231,.5); cursor: pointer; transition: all .18s; text-align: center;
+      white-space: nowrap;
+    }
+    .qopt:hover:not(.locked) {
+      background: rgba(var(--mode-accent-rgb), .1);
+      border-color: rgba(var(--mode-accent-rgb), .4);
+      color: var(--mode-accent);
+    }
+    .qopt.locked { cursor: default; }
+    .qopt.correct {
+      background: rgba(77,201,138,.15); border-color: rgba(77,201,138,.5);
+      color: #4DC98A; animation: optPop .28s ease;
+    }
+    .qopt.wrong {
+      background: rgba(224,85,85,.1); border-color: rgba(224,85,85,.3);
+      color: rgba(224,85,85,.5); text-decoration: line-through;
+      animation: optShake .35s ease;
+    }
+    .qopt.reveal {
+      background: rgba(77,201,138,.08); border-color: rgba(77,201,138,.3);
+      color: rgba(77,201,138,.7);
+    }
+    @keyframes optPop   { 0%{transform:scale(1)} 40%{transform:scale(1.04)} 100%{transform:scale(1)} }
+    @keyframes optShake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 60%{transform:translateX(6px)} }
+
+    /* gap uses .phrase-text + size classes */
+    .gap-blank-marker {
+      color: var(--mode-accent); font-weight: 900;
+    }
+    .gap-input-wrap { display: flex; flex-direction: column; align-items: center; gap: .65rem; }
+    .gap-input {
+      font-family: 'Space Grotesk', sans-serif; font-size: 1.6rem; font-weight: 900;
+      letter-spacing: .06em; text-transform: uppercase;
+      background: transparent; border: none; border-bottom: 2px solid var(--mode-accent);
+      color: var(--mode-accent); text-align: center; width: 200px; outline: none;
+      padding: .35rem 0; caret-color: var(--mode-accent);
+      transition: border-color .2s, color .2s;
+    }
+    .gap-input::placeholder {
+      color: rgba(229,229,231,.2); font-size: .9rem; text-transform: none;
+      font-family: 'DM Sans', sans-serif; font-weight: 400; letter-spacing: 0;
+    }
+    .gap-input.correct { border-bottom-color: #4DC98A; color: #4DC98A; }
+    .gap-input.wrong   { border-bottom-color: #E05555; color: #E05555; animation: optShake .35s ease; }
+    .gap-hint {
+      font-family: 'DM Sans', sans-serif; font-size: .78rem; font-weight: 600;
+      letter-spacing: .1em; text-transform: uppercase; color: rgba(229,229,231,.25);
+      min-height: 1.2rem; transition: color .2s;
+    }
+    .gap-hint.show-answer { color: var(--mode-accent); }
+
+    /* Feedback bar — shared by quiz & gap */
+    .fb-bar {
+      height: 0; overflow: hidden; display: flex; align-items: center;
+      gap: .6rem; padding: 0 1.2rem;
+      transition: height .22s cubic-bezier(.22,1,.36,1);
+      border-top: none; font-size: .88rem; color: rgba(229,229,231,.7);
+      position: absolute; bottom: 54px; left: 0; right: 0;
+    }
+    .fb-bar.show { height: 40px; border-top: 1px solid rgba(255,255,255,.06); }
+    .fb-icon { font-size: .9rem; flex-shrink: 0; }
+    .fb-text strong { color: #e5e5e7; font-weight: 700; }
+
+    /* Section label (x-ray) */
+    .section-label {
+      position: absolute; top: .85rem; left: 50%; transform: translateX(-50%);
+      font-family: 'DM Sans', sans-serif; font-size: .54rem; font-weight: 700;
+      letter-spacing: .18em; text-transform: uppercase; color: var(--gold);
+      opacity: 0; transition: opacity .3s; pointer-events: none; white-space: nowrap; z-index: 20;
+    }
+    .section-label.visible { opacity: .75; }
+
+    .hold-hint {
+      position: absolute; bottom: 3.8rem; left: 50%; transform: translateX(-50%);
+      font-family: 'DM Sans', sans-serif; font-size: .5rem; font-weight: 600;
+      letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.13);
+      pointer-events: none; transition: opacity .8s; white-space: nowrap; z-index: 5;
+    }
+    .hold-hint.hidden { opacity: 0; }
+
+    /* Nav arrows */
+    .nav-arrows {
+      position: absolute; top: 50%; left: 0; right: 0; transform: translateY(-50%);
+      display: flex; justify-content: space-between; padding: 0 .7rem;
+      pointer-events: none; z-index: 20;
+    }
+    .arrow-btn {
+      pointer-events: all; width: 42px; height: 42px; border-radius: 50%;
+      background: rgba(201,169,97,.18); border: 1px solid rgba(201,169,97,.35);
+      color: var(--gold); font-size: 1.1rem;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all .25s;
+    }
+    .arrow-btn:hover:not(:disabled) { background: rgba(201,169,97,.32); transform: scale(1.12); }
+    .arrow-btn:disabled { opacity: .18; cursor: not-allowed; }
+
+    /* Dot nav */
+    .dot-nav {
+      height: 54px; display: flex; align-items: center; justify-content: center;
+      gap: .5rem; background: rgba(0,0,0,.22); border-top: 1px solid rgba(255,255,255,.04);
+      flex-wrap: wrap; padding: 0 1rem;
+    }
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(99,99,102,.32); cursor: pointer; transition: all .3s; flex-shrink: 0;
+      border: none;
+    }
+    .dot.active {
+      background: var(--verb-color, var(--gold)); transform: scale(1.45);
+      box-shadow: 0 0 10px rgba(var(--verb-rgb, 201,169,97), .5);
+    }
+    .dot.ok  { background: #4DC98A; opacity: .75; }
+    .dot.err { background: #E05555; opacity: .65; }
+    .dot:hover:not(.active) { background: rgba(var(--verb-rgb, 201,169,97), .45); }
+
+    /* ── BOTTOM BAR ── */
+    .bottom-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; height: 80px;
+      padding: .65rem 1.25rem .85rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      background: rgba(13,13,13,.88); backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255,255,255,.06);
+    }
+    .bottom-bar { height: 34px; padding: .3rem 1rem; }
+  .score-row { display: flex; align-items: center; gap: .85rem; flex-shrink: 0; }
+    .score-item {
+      font-family: 'DM Sans', sans-serif; font-size: .7rem; font-weight: 700;
+      display: flex; align-items: center; gap: .35rem; color: rgba(229,229,231,.35);
+    }
+    .score-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .score-dot.ok  { background: #4DC98A; }
+    .score-dot.bad { background: #E05555; }
+    .score-num { font-variant-numeric: tabular-nums; }
+
+    .check-btn {
+      font-family: 'Space Grotesk', sans-serif; font-size: .58rem; font-weight: 700;
+      letter-spacing: .12em; text-transform: uppercase;
+      padding: .5rem 1.4rem; border-radius: 999px;
+      background: rgba(var(--mode-accent-rgb), .1);
+      border: 1px solid rgba(var(--mode-accent-rgb), .35);
+      color: var(--mode-accent); cursor: pointer; transition: all .18s;
+      display: none;
+    }
+    .check-btn:hover { background: rgba(var(--mode-accent-rgb), .25); }
+    .check-btn:disabled { opacity: .3; cursor: not-allowed; }
+
+    .auto-row { display: flex; align-items: center; gap: .5rem; cursor: pointer; flex-shrink: 0; }
+    .auto-label {
+      font-family: 'Space Grotesk', sans-serif; font-size: .52rem; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.26); transition: color .3s;
+    }
+    .auto-row.on .auto-label { color: rgba(255,255,255,.7); }
+    .switch {
+      width: 38px; height: 21px; border-radius: 999px;
+      background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1);
+      position: relative; transition: all .3s;
+    }
+    .auto-row.on .switch { background: rgba(201,169,97,.22); border-color: var(--gold); }
+    .switch::after {
+      content: ''; position: absolute; top: 2px; left: 2px;
+      width: 15px; height: 15px; border-radius: 50%;
+      background: rgba(255,255,255,.32); transition: transform .3s, background .3s;
+    }
+    .auto-row.on .switch::after { transform: translateX(17px); background: var(--gold); }
+
+    /* Progress bar */
+    .progress { position: fixed; bottom: 80px; left: 0; right: 0; height: 2px; background: rgba(255,255,255,.04); z-index: 50; }
+    .progress-fill { height: 100%; background: var(--verb-color, var(--gold)); width: 0%; transition: background .4s; }
+
+    /* Loading */
+    .loading-screen { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #0d0d0d; z-index: 999; transition: opacity .6s; }
+    .loading-screen.fade { opacity: 0; pointer-events: none; }
+    .ld { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); animation: ld 1.2s ease-in-out infinite; }
+    @keyframes ld { 0%,100%{opacity:.2;transform:scale(.7)} 50%{opacity:1;transform:scale(1.3)} }
+
+    /* ── RESULTS OVERLAY ── */
+    .overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(8,8,8,.97); backdrop-filter: blur(28px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity .45s; overflow-y: auto;
+    }
+    .overlay.show { opacity: 1; pointer-events: all; }
+    .ov-inner {
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      padding: 28px 20px 32px; max-width: 460px; width: 100%; position: relative; z-index: 1;
+    }
+    .ov-perfect {
+      font-family: 'Space Grotesk', sans-serif; font-size: .62rem; font-weight: 700;
+      letter-spacing: .22em; text-transform: uppercase; color: var(--gold);
+      background: rgba(201,169,97,.12); border: 1px solid rgba(201,169,97,.4);
+      padding: .38rem 1.1rem; border-radius: 999px; display: none;
+    }
+    .ov-perfect.show { display: block; animation: pulseBadge 1.8s ease-in-out infinite; }
+    @keyframes pulseBadge { 0%,100%{box-shadow:0 0 0 0 rgba(201,169,97,.4)} 50%{box-shadow:0 0 0 10px rgba(201,169,97,0)} }
+    .ov-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(48px,13vw,84px); font-weight: 900; letter-spacing: -.03em;
+      color: var(--verb-color, var(--gold)); line-height: 1;
+    }
+    .overlay.show .ov-title { animation: popIn .5s cubic-bezier(.34,1.56,.64,1) forwards; }
+    @keyframes popIn { 0%{transform:scale(.7);opacity:0} 70%{transform:scale(1.06)} 100%{transform:scale(1);opacity:1} }
+    .ov-score { font-family: 'DM Sans', sans-serif; font-size: 1rem; letter-spacing: .05em; color: rgba(229,229,231,.6); }
+    .ov-stars { display: flex; gap: 6px; font-size: 28px; }
+    @keyframes starPop { 0%{transform:scale(0) rotate(-20deg);opacity:0} 70%{transform:scale(1.25) rotate(5deg)} 100%{transform:scale(1) rotate(0deg);opacity:1} }
+    .ov-star { opacity: 0; }
+    .overlay.show .ov-star:nth-child(1) { animation: starPop .4s cubic-bezier(.34,1.56,.64,1) .2s forwards; }
+    .overlay.show .ov-star:nth-child(2) { animation: starPop .4s cubic-bezier(.34,1.56,.64,1) .35s forwards; }
+    .overlay.show .ov-star:nth-child(3) { animation: starPop .4s cubic-bezier(.34,1.56,.64,1) .5s forwards; }
+    .ov-bars { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; max-width: 300px; }
+    .ov-bar { flex: 1; min-width: 14px; max-width: 28px; height: 36px; border-radius: 5px; }
+    .ov-msg { font-size: .85rem; color: rgba(229,229,231,.4); max-width: 300px; text-align: center; line-height: 1.75; }
+    .ov-answers {
+      width: 100%; max-height: 220px; overflow-y: auto;
+      background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07);
+      border-radius: .85rem; padding: .5rem;
+      scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.1) transparent;
+    }
+    .ov-answers::-webkit-scrollbar { width: 4px; }
+    .ov-answers::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 4px; }
+    .ov-answer-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .45rem .75rem; border-radius: .5rem; margin-bottom: .22rem;
+      border-left: 3px solid transparent;
+      opacity: 0; transform: translateX(-8px);
+      animation: slideInA .35s ease forwards;
+    }
+    .ov-answer-item:last-child { margin-bottom: 0; }
+    @keyframes slideInA { to { opacity: 1; transform: translateX(0); } }
+    .ov-answer-item.ok  { background: rgba(77,201,138,.07); border-left-color: #4DC98A; }
+    .ov-answer-item.err { background: rgba(224,85,85,.07);  border-left-color: #E05555; }
+    .ov-answer-verb {
+      font-family: 'Space Grotesk', sans-serif; font-size: .7rem; font-weight: 700;
+      letter-spacing: .06em; text-transform: uppercase;
+    }
+    .ov-answer-item.ok  .ov-answer-verb { color: #4DC98A; }
+    .ov-answer-item.err .ov-answer-verb { color: #E05555; }
+    .ov-answer-meaning {
+      font-family: 'DM Sans', sans-serif; font-size: .7rem; color: rgba(229,229,231,.32);
+      text-align: right; max-width: 58%; line-height: 1.4;
+    }
+    .ov-btns { display: flex; gap: 10px; margin-top: 6px; }
+    .ov-btn {
+      font-family: 'Space Grotesk', sans-serif; font-size: .62rem; font-weight: 700;
+      letter-spacing: .15em; padding: .75rem 1.6rem; border-radius: 999px;
+      cursor: pointer; transition: all .16s; text-transform: uppercase;
+    }
+    .ov-btn.primary { background: var(--verb-color, var(--gold)); color: #0d0d0d; border: 2px solid var(--verb-color, var(--gold)); }
+    .ov-btn.ghost { background: transparent; color: rgba(229,229,231,.5); border: 1px solid rgba(255,255,255,.15); }
+    .ov-btn.ghost:hover { border-color: rgba(255,255,255,.35); color: #e5e5e7; }
+    /* Award popup */
+    .award-popup { position: fixed; inset: 0; z-index: 300; display: flex; align-items: center; justify-content: center; pointer-events: none; opacity: 0; transition: opacity .3s; }
+    .award-popup.show { opacity: 1; }
+    .award-inner { font-size: clamp(80px,22vw,160px); line-height: 1; pointer-events: none; }
+    @keyframes zoomFade { 0%{transform:scale(.4);opacity:0} 40%{transform:scale(1.1);opacity:1} 70%{transform:scale(1);opacity:1} 100%{transform:scale(1.2);opacity:0} }
+    .award-popup.show .award-inner { animation: zoomFade 2s cubic-bezier(.22,1,.36,1) forwards; }
+
+    /* Streak flash */
+    .streak-flash {
+      position: fixed; top: 156px; left: 50%; transform: translateX(-50%);
+      font-family: 'Space Grotesk', sans-serif; font-size: .72rem; font-weight: 700;
+      letter-spacing: .15em; text-transform: uppercase;
+      color: var(--gold); background: rgba(12,12,12,.92);
+      border: 1px solid rgba(201,169,97,.4); border-radius: 999px; padding: .45rem 1.2rem;
+      z-index: 100; pointer-events: none; opacity: 0; transition: opacity .3s; white-space: nowrap;
+   }
+    .streak-flash.show { opacity: 1; }
+
+
+    /* ══════════════════ MATCH MODE — word bank + two columns ══════════════════ */
+     .match-slide { padding: 1rem 1.4rem .5rem; gap: 0; align-items: stretch; }
+.match-bank {
+  display: flex; flex-wrap: wrap; justify-content: center;
+  gap: .3rem .4rem; padding-bottom: .6rem; margin-bottom: .6rem;
+  border-bottom: 1px solid rgba(255,255,255,.07); flex-shrink: 0;
+}
+    
+    .match-chip {
+      font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: .68rem;
+      letter-spacing: .04em; text-transform: uppercase;
+      padding: .32rem .7rem; border-radius: 999px;
+      background: rgba(255,255,255,.04); border: 1.5px solid rgba(255,255,255,.12);
+      color: rgba(229,229,231,.6); cursor: pointer; transition: all .18s; white-space: nowrap;
+    }
+    .match-chip:hover:not(.used):not(.selected) {
+      background: rgba(var(--mode-accent-rgb), .1); border-color: rgba(var(--mode-accent-rgb), .4); color: var(--mode-accent);
+      transform: translateY(-1px);
+    }
+    .match-chip.selected {
+      background: var(--mode-accent); color: #0d0d0d; border-color: var(--mode-accent);
+      box-shadow: 0 0 0 3px rgba(var(--mode-accent-rgb), .25);
+    }
+    .match-chip.used { opacity: .28; text-decoration: line-through; cursor: default; border-color: rgba(255,255,255,.08); color: rgba(255,255,255,.3); }
+    .match-chip.wrong-shake { animation: optShake .35s ease; }
+   .match-rows {
+  display: flex; flex-direction: column; gap: .4rem;
+}
+.match-row {
+  display: flex; align-items: flex-start; gap: .75rem;
+  padding: .2rem 0;
+}
+.match-row-num {
+  flex-shrink: 0; width: 1.5em; height: 1.5em; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Space Grotesk', sans-serif; font-size: .8rem; font-weight: 700;
+  background: rgba(var(--verb-rgb, 201,169,97), .18); color: var(--verb-color, var(--gold));
+  border: 1px solid rgba(var(--verb-rgb, 201,169,97), .3);
+}
+.match-row-num.filled { background: linear-gradient(135deg,#84cc16,#65a30d); color: #fff; border-color: #84cc16; }
+    .match-row:nth-child(even) { background: rgba(255,255,255,.015); }
+    .match-row.wrong-flash { background: rgba(224,85,85,.1); }
+.match-blank {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 60px; min-height: 1.5em;
+  padding: .15rem .6rem;
+  border-radius: 999px;
+  border: 1.5px dashed rgba(255,255,255,.18);
+  background: rgba(255,255,255,.02);
+  font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: .78rem;
+  letter-spacing: .04em; text-transform: uppercase;
+  color: rgba(255,255,255,.2);
+  cursor: pointer; transition: all .2s;
+}
+.match-blank:hover:not(.filled) {
+  border-color: var(--mode-accent); border-style: dashed;
+  background: rgba(var(--mode-accent-rgb), .06);
+  color: var(--mode-accent);
+}
+.match-blank.filled {
+  border-style: solid;
+  border-color: var(--mode-accent);
+  background: rgba(var(--mode-accent-rgb), .14);
+  color: var(--mode-accent);
+  cursor: default;
+}
+.match-blank .particle { font-weight: 900; text-decoration: underline; text-underline-offset: 3px; }
+.match-blank.result-ok {
+  border-color: #4DC98A; background: rgba(77,201,138,.12); color: #4DC98A;
+}
+.match-blank.result-err {
+  border-color: #E05555; background: rgba(224,85,85,.1); color: #E05555;
+}
+.match-blank.result-err .reveal-answer { display: block; font-size: .54rem; letter-spacing: .06em; color: #4DC98A; text-decoration: none; margin-top: .05rem; }
+   .match-meaning {
+  flex: 1; padding-top: .1rem;
+  font-family: 'DM Sans', sans-serif; font-size: .85rem; line-height: 1.5;
+  color: rgba(229,229,231,.75);
+}
+
+    .match-round-label {
+      position: absolute; top: .85rem; right: 1rem;
+      font-family: 'DM Sans', sans-serif; font-size: .56rem; font-weight: 700;
+      letter-spacing: .14em; text-transform: uppercase; color: rgba(255,217,74,.55);
+      pointer-events: none; z-index: 6;
+    }
+    .match-check-wrap {
+      flex-shrink: 0; display: flex; justify-content: center; padding-top: .85rem;
+    }
+    .match-check-btn {
+      font-family: 'Space Grotesk', sans-serif; font-size: .62rem; font-weight: 700;
+      letter-spacing: .14em; text-transform: uppercase; padding: .55rem 1.8rem;
+      border-radius: 999px; background: rgba(var(--mode-accent-rgb),.14);
+      border: 1px solid rgba(var(--mode-accent-rgb),.4); color: var(--mode-accent);
+      cursor: pointer; transition: all .18s;
+    }
+    .match-check-btn:hover:not(:disabled) { background: rgba(var(--mode-accent-rgb),.28); }
+    .match-check-btn:disabled { opacity: .25; cursor: not-allowed; }
+ html.match-scroll, body.match-scroll { overflow-y: auto; height: auto; }
+body.match-scroll .stage {
+  position: relative; top: auto; bottom: auto;
+  height: auto; min-height: calc(100vh - 128px - 80px);
+padding: .3rem 1rem 1rem; margin-top: 128px; margin-bottom: 80px;
+}
+body.match-scroll .slide-card.match-mode { max-height: none; height: auto; }
+body.match-scroll .slides-container { height: auto; overflow: visible; }
+
+    @media(max-width:600px){
+.match-chip { font-size: .87rem; padding: .39rem .69rem; }
+.match-row { gap: .39rem; padding: .14rem 0; }
+.match-blank { font-size: .92rem; min-width: 60px; min-height: 1.46em; padding: .11rem .42rem; }
+.match-meaning { font-size: 1.01rem; line-height: 1.42; }
+.header { height: 100px; gap: .35rem; padding: .4rem 1.25rem .35rem; }
+  .qopt { font-size: .58rem; padding: .32rem .75rem; }
+  .bottom-bar { flex-wrap: wrap; height: auto; padding: .5rem 1rem .6rem; gap: .5rem; }
+.stage { top: 100px; bottom: 34px; padding: .3rem; }
+.progress { bottom: 34px; }
+  .verb-tabs { justify-content: flex-start; }
+  .match-slide { padding: 1.2rem .9rem .5rem; }
+}
+    
+  </style>
 </head>
 <body>
 
-<header>
-  <h1>Incoming</h1>
-  <p class="sub" id="subline">Words rise up out of the dark and grow as they close in.</p>
+<div class="loading-screen" id="loadingScreen"><div class="ld"></div></div>
+
+<header class="header">
+  <div class="header-top">
+    <a class='back-link' href='/?openModal=grammar'>← Grammar</a>
+    <div class="header-title">
+      <div class="app-title">INTUITY</div>
+      <div class="app-subtitle">Phrasal Verbs</div>
+    </div>
+    <div class="header-spacer" aria-hidden="true"></div>
+  </div>
+  <div class="mode-selector">
+    <button class="mode-btn" data-mode="learn">
+      <span class="mode-icon">✎</span><span class="mode-label">Learn</span><span class="mode-badge" id="badge-learn">–</span>
+    </button>
+    <button class="mode-btn active" data-mode="quiz">
+      <span class="mode-icon">⚡</span><span class="mode-label">Quiz</span><span class="mode-badge" id="badge-quiz">–</span>
+    </button>
+    <button class="mode-btn" data-mode="gap">
+      <span class="mode-icon">✍</span><span class="mode-label">Practice</span><span class="mode-badge" id="badge-gap">–</span>
+    </button>
+    <button class="mode-btn" data-mode="match">
+      <span class="mode-icon">🔗</span><span class="mode-label">Match</span><span class="mode-badge" id="badge-match">–</span>
+    </button>
+    <button class="mode-btn" data-mode="incoming">
+      <span class="mode-icon">🎮</span><span class="mode-label">Game</span><span class="mode-badge" id="badge-incoming">–</span>
+    </button>
+  </div>
+  <div class="verb-tabs" id="verbTabs"></div>
 </header>
 
-<div id="frame">
-
-  <!-- ============ MENU SCREEN ============ -->
-  <section class="screen active" id="menu">
-    <div class="stagebar" id="stagebar"></div>
-    <div class="stagecaption" id="stagecaption"></div>
-
-    <div class="sectiontitle">Practice a verb</div>
-    <div class="verbgrid" id="verbgrid"></div>
-
-    <div class="sectiontitle">Revision — every verb shuffled together</div>
-    <div class="mixgrid" id="revgrid"></div>
-
-    <div class="trialcard locked" id="trialcard">
-      <svg class="icon" viewBox="0 0 24 24" fill="none"><path id="trialIconPath" d="M2 18l3-11 5 4 4-7 4 7 5-4 3 11H2z" fill="#5a5a52" stroke="none"/></svg>
-      <div>
-        <div class="tt" id="trialTitle">Final Trial — locked</div>
-        <div class="td" id="trialDesc">Clear every mix to unlock the Crown trial.</div>
-      </div>
+<div class="stage" id="stage">
+  <div class="slide-card" id="slideCard">
+    <div class="section-label" id="sectionLabel"></div>
+    <div class="slides-container" id="slidesContainer"></div>
+    <div class="nav-arrows">
+      <button class="arrow-btn" id="prevBtn">←</button>
+      <button class="arrow-btn" id="nextBtn">→</button>
     </div>
-  </section>
-
-  <!-- ============ PLAY SCREEN ============ -->
-  <section class="screen" id="play">
-    <div class="hud">
-      <button class="backbtn" id="backBtn">← map</button>
-      <span class="hit"><span id="hitVal">0</span> hit</span>
-      <span class="miss"><span id="missVal">0</span> missed</span>
-      <span class="spacer"></span>
-      <span class="streak" id="streakLabel">streak <span id="streakVal">0</span></span>
-      <span class="clock" id="clockVal">2:00</span>
-    </div>
-    <div class="prompt">
-      <div class="promptlabel"><span id="mixLabel">Match this meaning</span></div>
-      <p class="prompttext" id="promptText">…</p>
-    </div>
-    <div class="field" id="field"></div>
-    <div class="toast" id="toast"></div>
-  </section>
-
-  <!-- ============ SUMMARY SCREEN ============ -->
-  <section class="screen" id="summary">
-    <div class="sumeyebrow" id="sumEyebrow">PRACTICE</div>
-    <div class="sumverdict" id="sumVerdict">Cleared</div>
-    <div class="sumstars" id="sumStars"></div>
-    <div class="sumstats">
-      <div><b id="sumHits">0</b><span>hit</span></div>
-      <div><b id="sumMiss">0</b><span>missed</span></div>
-      <div><b id="sumAcc">0%</b><span>accuracy</span></div>
-    </div>
-    <div class="sumactions">
-      <button class="sumbtn" id="sumRetry">Retry</button>
-      <button class="sumbtn primary" id="sumNext">Back to map</button>
-    </div>
-    <div class="sumnote" id="sumNote"></div>
-  </section>
-
-  <!-- ============ STAGE-UP OVERLAY ============ -->
-  <div id="stageup">
-    <svg class="ic" id="stageupIcon" viewBox="0 0 24 24"></svg>
-    <div class="eyebrow">New stage</div>
-    <div class="name" id="stageupName"></div>
-    <div class="desc" id="stageupDesc"></div>
-    <div class="tap">tap to continue</div>
+    <div class="hold-hint" id="holdHint">Hold for verb ID</div>
+    <div class="dot-nav" id="dotNav"></div>
   </div>
-
 </div>
 
-<script type="application/json" id="verbData">{"title": "Phrasal Verbs", "level": "B2", "verbs": [{"id": "take", "label": "TAKE", "color": "#C9A961", "items": [{"particle": "off", "meaning": "to remove clothing; (of aircraft) to leave the ground and begin flying", "example": "The plane will _____ at 3pm from Heathrow airport.", "options":["off","up","over","back"]}, {"particle": "up", "meaning": "to begin a hobby, sport, or activity; to occupy time or space", "example": "I've decided to _____ tennis as a hobby this year.", "options":["up","off","over","back"]}, {"particle": "over", "meaning": "to gain control of something; to begin doing someone else's job", "example": "The new manager will _____ from Mr. Smith next month.", "options":["over","off","up","back"]}, {"particle": "back", "meaning": "to return something; to withdraw a statement or promise", "example": "I'd like to _____ what I said earlier - I was wrong.", "options":["back","off","up","over"]}, {"particle": "out", "meaning": "to remove something; to invite someone to go somewhere socially", "example": "He offered to _____ his colleagues for dinner to celebrate the promotion.", "options":["out","off","up","over"]}, {"particle": "down", "meaning": "to write information; to remove something from a wall or high place", "example": "Please _____ these important points in your notebook.", "options":["down","off","up","over"]}, {"particle": "aback", "meaning": "to surprise or shock someone", "example": "Such blunt criticism can easily _____ a young, inexperienced manager.", "options":["aback","back","along","away"]}, {"particle": "along", "meaning": "to bring someone or something with you", "example": "Don't forget to _____ some water for the hike.", "options":["along","apart","away","in"]}, {"particle": "apart", "meaning": "to separate something into pieces", "example": "He loves to _____ old radios just to see how they work.", "options":["apart","along","down","up"]}, {"particle": "away", "meaning": "to remove or subtract", "example": "The waiter will _____ your plates once you've finished eating.", "options":["away","along","apart","in"]}, {"particle": "in", "meaning": "to absorb information or deceive someone", "example": "It's hard to _____ so much information in just one lecture.", "options":["in","on","up","over"]}, {"particle": "on", "meaning": "to accept a job or responsibility", "example": "The company decided to _____ extra staff for the holiday season.", "options":["on","in","up","over"]}, {"particle": "for", "meaning": "to fail to appreciate someone or something because it's always available", "example": "We often _____ granted the comforts of modern life.", "options":["for","to","about","through"]}, {"particle": "to", "meaning": "to start liking someone or something quickly; to begin doing as a habit", "example": "The public will probably _____ the new mobile app remarkably quickly.", "options":["to","for","in","on"]}, {"particle": "about", "meaning": "to guide or show someone around a place", "example": "An enthusiastic guide agreed to _____ our whole group before the museum's official opening.", "options":["about","along","for","through"]}, {"particle": "through", "meaning": "to guide someone step by step through information or a process", "example": "The consultant offered to _____ the whole team before the big client meeting.", "options":["through","over","about","to"]}]}, {"id": "go", "label": "GO", "color": "#3fbfb2", "items": [{"particle": "out", "meaning": "to leave home for social reasons; to stop burning; to be in a romantic relationship", "example": "Would you like to _____ for dinner this weekend?", "options":["out","off","through","over"]}, {"particle": "off", "meaning": "to explode; to ring (alarm); to become bad (food)", "example": "The bomb could _____ at any moment according to experts.", "options":["off","out","through","over"]}, {"particle": "through", "meaning": "to experience something difficult; to examine carefully", "example": "Let's _____ the plan one more time before the presentation.", "options":["through","out","off","over"]}, {"particle": "over", "meaning": "to review or examine; to be received in a particular way", "example": "Can you _____ my essay and check for grammar mistakes?", "options":["over","out","off","through"]}, {"particle": "back", "meaning": "to return to a place or previous state; to extend to an earlier time", "example": "We can't _____ on our promise to help them move house.", "options":["back","out","off","through"]}, {"particle": "ahead", "meaning": "to proceed with something; to take place as planned", "example": "Despite the difficulties, we decided to _____ with the project.", "options":["ahead","out","off","through"]}, {"particle": "away", "meaning": "to leave a place; to disappear", "example": "I wish this headache would _____ - I've had it all day.", "options":["away","out","off","through"]}, {"particle": "about", "meaning": "to deal with a problem or task", "example": "I'm not sure how to _____ fixing this old computer.", "options":["about","around","along","by"]}, {"particle": "along", "meaning": "to agree with or accompany", "example": "She decided to _____ with the plan even though she had doubts.", "options":["along","about","ahead","by"]}, {"particle": "around", "meaning": "to be enough for everyone", "example": "I hope there's enough pizza to _____ tonight.", "options":["around","about","along","by"]}, {"particle": "by", "meaning": "to pass (time) or follow rules", "example": "The years seem to _____ so quickly these days.", "options":["by","along","around","through"]}, {"particle": "down", "meaning": "to decrease or sink", "example": "Prices are expected to _____ next month due to competition.", "options":["down","under","off","out"]}, {"particle": "for", "meaning": "to choose, try for, or attack", "example": "I think I'll _____ the chicken salad instead of the burger.", "options":["for","through","along","about"]}, {"particle": "in", "meaning": "to enter a building or room", "example": "It was raining, so we decided to _____ and wait.", "options":["in","out","through","back"]}, {"particle": "under", "meaning": "to go bankrupt or sink", "example": "Many small businesses _____ during the recession.", "options":["under","down","out","off"]}, {"particle": "on", "meaning": "to continue; to happen (of an event)", "example": "The meeting seemed to _____ forever without reaching a decision.", "options":["on","ahead","through","away"]}, {"particle": "with", "meaning": "to match or complement; to choose or accept", "example": "I think the blue tie will _____ your grey suit nicely.", "options":["with","for","along","about"]}, {"particle": "up", "meaning": "to increase; to be built; to explode", "example": "House prices are expected to _____ again next year.", "options":["up","down","over","ahead"]}]}, {"id": "look", "label": "LOOK", "color": "#e85a4f", "items": [{"particle": "after", "meaning": "to take care of someone or something", "example": "Can you _____ my cat while I'm on holiday next week?", "options":["after","out","up","down on"]}, {"particle": "out", "meaning": "to be careful; to watch for danger", "example": "_____! There's a car coming towards you very fast!", "options":["out","after","up","down on"]}, {"particle": "up", "meaning": "to search for information in a reference book; to improve", "example": "If you don't know a word, _____ the definition in a dictionary.", "options":["up","after","out","down on"]}, {"particle": "down on", "meaning": "to consider someone as inferior", "example": "She tends to _____ people who didn't go to university.", "options":["down on","after","out","up"]}, {"particle": "up to", "meaning": "to admire and respect someone", "example": "Young children often _____ their older siblings and copy them.", "options":["up to","after","out","up"]}, {"particle": "over", "meaning": "to examine or inspect quickly", "example": "Can you _____ my homework before I hand it in tomorrow?", "options":["over","after","out","up"]}, {"particle": "back", "meaning": "to think about the past; to remember", "example": "When I _____ on my childhood, I realize how happy I was.", "options":["back","after","out","up"]}, {"particle": "ahead", "meaning": "to think about or plan for the future", "example": "Smart businesses always _____ to prepare for challenges.", "options":["ahead","around","back","forward to"]}, {"particle": "around", "meaning": "to explore your options, especially before making a decision", "example": "It's always wise to _____ before committing to a big purchase.", "options":["around","ahead","for","into"]}, {"particle": "at", "meaning": "to consider or examine something", "example": "The committee will _____ whether the current rules are still fair.", "options":["at","into","through","over"]}, {"particle": "for", "meaning": "to search for something or someone", "example": "Officers now need to _____ witnesses to the incident.", "options":["for","into","through","at"]}, {"particle": "forward to", "meaning": "to feel excited about something that will happen", "example": "We really _____ your visit next month.", "options":["forward to","ahead","back","around"]}, {"particle": "into", "meaning": "to investigate or examine something thoroughly", "example": "Ministers have promised to _____ the allegations of misconduct.", "options":["into","through","at","for"]}, {"particle": "through", "meaning": "to examine something from beginning to end, often searching for something", "example": "The committee needs to _____ hundreds of documents before deciding.", "options":["through","into","over","at"]}]}, {"id": "get", "label": "GET", "color": "#5B9BD5", "items": [{"particle": "up", "meaning": "to rise from bed; to stand up", "example": "I always _____ at 6:30am to go jogging before breakfast.", "options":["up","off","over","through"]}, {"particle": "off", "meaning": "to leave transport; to escape punishment", "example": "Please _____ the bus at the next stop near the hospital.", "options":["off","up","over","through"]}, {"particle": "over", "meaning": "to recover from illness or disappointment", "example": "It took me weeks to _____ the flu I caught last month.", "options":["over","up","off","through"]}, {"particle": "through", "meaning": "to complete successfully; to make contact by phone", "example": "How will we _____ all this work before the deadline?", "options":["through","up","off","over"]}, {"particle": "away", "meaning": "to escape; to go on holiday", "example": "The thieves managed to _____ before the police arrived.", "options":["away","up","off","over"]}, {"particle": "back", "meaning": "to return; to retrieve something", "example": "What time did you _____ from your trip to London yesterday?", "options":["back","up","off","over"]}, {"particle": "by", "meaning": "to manage with difficulty", "example": "We don't earn much but we manage to _____ somehow.", "options":["by","up","off","over"]}, {"particle": "along", "meaning": "to have a good relationship with someone", "example": "I _____ really well with my new flatmates - we're good friends.", "options":["along","up","off","over"]}, {"particle": "down", "meaning": "to make someone depressed; to descend", "example": "Don't let exam stress _____ the whole class - just do your best.", "options":["down","up","off","over"]}, {"particle": "across", "meaning": "to make people understand an idea", "example": "It's not always easy to _____ your ideas clearly in a short speech.", "options":["across","over","through","along"]}, {"particle": "ahead", "meaning": "to become successful in your career", "example": "Working hard is essential if you want to _____ in your career.", "options":["ahead","along","back","up"]}, {"particle": "around", "meaning": "to travel to different places", "example": "We used bicycles to _____ the small island.", "options":["around","across","along","through"]}, {"particle": "at", "meaning": "to imply or mean something", "example": "I don't understand what you're trying to _____ with that comment.", "options":["at","by","across","along"]}, {"particle": "behind", "meaning": "to fail to make progress on time", "example": "The construction team started to _____ schedule due to bad weather.", "options":["behind","back","down","along"]}, {"particle": "in", "meaning": "to enter a vehicle or place", "example": "What time does the train _____ tonight?", "options":["in","up","through","across"]}, {"particle": "out", "meaning": "to leave; (of information) to become known", "example": "News of the scandal managed to _____ despite tight security.", "options":["out","away","off","in"]}, {"particle": "for", "meaning": "to be sold for a particular price", "example": "The old painting could _____ several million pounds at auction.", "options":["for","at","by","across"]}]}, {"id": "keep", "label": "KEEP", "color": "#9a6baa", "items": [{"particle": "up", "meaning": "to continue at the same rate; to maintain standards", "example": "Well done! _____ the good work and you'll pass the exam.", "options":["up","off","away","out"]}, {"particle": "off", "meaning": "to stay away from; to avoid", "example": "_____ the grass! There's a sign saying not to walk on it.", "options":["off","up","away","out"]}, {"particle": "away", "meaning": "to remain at a distance; to prevent from approaching", "example": "Try to _____ from junk food if you want to lose weight.", "options":["away","up","off","out"]}, {"particle": "out", "meaning": "to remain outside; to prevent from entering", "example": "Please _____ of the kitchen while I'm cooking dinner.", "options":["out","up","off","away"]}, {"particle": "to", "meaning": "to stay within limits; to fulfill a promise or arrangement", "example": "You must _____ your promise to help with the school concert.", "options":["to","up","off","away"]}, {"particle": "down", "meaning": "to control or limit; to remain at a low level", "example": "The doctor advised him to _____ his cholesterol levels.", "options":["down","up","off","away"]}, {"particle": "in", "meaning": "to not reveal information; to confine", "example": "They decided to _____ the news until after the wedding.", "options":["in","up","off","away"]}]}, {"id": "put", "label": "PUT", "color": "#f0a23c", "items": [{"particle": "off", "meaning": "to postpone; to cause someone to lose interest", "example": "Don't _____ until tomorrow what you can do today - start now!", "options":["off","on","up","away"]}, {"particle": "on", "meaning": "to wear clothing; to switch on; to gain weight; to pretend", "example": "_____ your coat - it's freezing outside this morning.", "options":["on","off","up","away"]}, {"particle": "up", "meaning": "to provide accommodation; to erect; to display", "example": "We can _____ any latecomers for the night if they miss the last train.", "options":["up","off","on","away"]}, {"particle": "away", "meaning": "to store in the proper place; to save money", "example": "Please _____ your toys when you've finished playing with them.", "options":["away","off","on","up"]}, {"particle": "down", "meaning": "to place on a surface; to criticize; to kill an animal humanely", "example": "The teacher had to _____ the phone during the lesson.", "options":["down","off","on","up"]}, {"particle": "out", "meaning": "to extinguish; to inconvenience; to publish", "example": "Firefighters managed to _____ the blaze before it spread.", "options":["out","off","on","up"]}, {"particle": "back", "meaning": "to return to original position; to postpone", "example": "Can you _____ the meeting for an hour? I'm running late.", "options":["back","off","on","up"]}, {"particle": "forward", "meaning": "to propose or suggest an idea", "example": "She _____ an interesting idea at the conference yesterday.", "options":["forward","off","on","up"]}, {"particle": "through", "meaning": "to connect by telephone; to cause to experience", "example": "I need to be _____ to the manager urgently, please.", "options":["through","off","on","up"]}, {"particle": "about", "meaning": "to spread a rumor or report", "example": "Someone has been _____ rumors about the company's finances.", "options":["about","across","aside","forward"]}, {"particle": "across", "meaning": "to communicate a message clearly", "example": "The teacher managed to _____ a difficult concept very simply.", "options":["across","about","aside","forward"]}, {"particle": "aside", "meaning": "to save for later or ignore", "example": "We should _____ our differences and work together.", "options":["aside","about","across","away"]}, {"particle": "in", "meaning": "to insert or invest time/effort", "example": "She decided to _____ extra hours to finish the project on time.", "options":["in","up","on","out"]}]}, {"id": "turn", "label": "TURN", "color": "#5a9657", "items": [{"particle": "on", "meaning": "to switch on; to attack suddenly", "example": "Can you _____ the lights when you come in? It's dark.", "options":["on","off","up","down"]}, {"particle": "off", "meaning": "to switch off; to cause to lose interest", "example": "Don't forget to _____ your computer before you leave work.", "options":["off","on","up","down"]}, {"particle": "up", "meaning": "to arrive; to increase volume; to be found", "example": "Could you _____ the volume? I can't hear the TV properly.", "options":["up","on","off","down"]}, {"particle": "down", "meaning": "to refuse; to reduce volume", "example": "Please _____ the music - the neighbors are complaining again!", "options":["down","on","off","up"]}, {"particle": "over", "meaning": "to flip to the other side; to hand over to authorities", "example": "Remember to _____ your exam paper when the time is up.", "options":["over","on","off","up"]}, {"particle": "back", "meaning": "to return the way you came; to fold back", "example": "It's too late to _____ now - we're already committed to the plan.", "options":["back","on","off","up"]}, {"particle": "away", "meaning": "to refuse entry; to look in a different direction", "example": "The hotel had to _____ guests because they were fully booked.", "options":["away","on","off","up"]}, {"particle": "around", "meaning": "to face the opposite direction; to improve a bad situation", "example": "_____ and face me when I'm talking to you!", "options":["around","on","off","up"]}]}, {"id": "run", "label": "RUN", "color": "#c94f6d", "items": [{"particle": "out of", "meaning": "to use all of something; to have no more", "example": "We've _____ coffee - could you buy some on your way home?", "options":["out of","over","about","across"]}, {"particle": "over", "meaning": "to hit with a vehicle; to exceed time limit", "example": "Be careful not to _____ the cat when you're reversing the car.", "options":["over","out of","about","across"]}, {"particle": "into", "meaning": "to meet someone by chance; to encounter a problem", "example": "I happened to _____ an old school friend at the airport yesterday.", "options":["into","down","away","up"]}, {"particle": "away", "meaning": "to escape or flee", "example": "The children decided to _____ from home after an argument.", "options":["away","off","along","out of"]}, {"particle": "down", "meaning": "to criticize someone; to gradually reduce or exhaust something", "example": "She always tends to _____ her colleagues behind their backs.", "options":["down","over","into","up"]}, {"particle": "off", "meaning": "to leave quickly; to print copies of something", "example": "Could you _____ twenty copies of this handout before the meeting?", "options":["off","away","along","up"]}, {"particle": "through", "meaning": "to rehearse or practice quickly; to use up money fast", "example": "Let's _____ the presentation one more time before the client arrives.", "options":["through","over","up","down"]}, {"particle": "up", "meaning": "to accumulate a large debt or bill", "example": "He managed to _____ an enormous phone bill while travelling abroad.", "options":["up","down","through","off"]}, {"particle": "by", "meaning": "to tell someone your idea to get their opinion", "example": "This proposal needs to be _____ the whole team before we can move forward.", "options":["by","through","into","along"]}, {"particle": "along", "meaning": "to leave (informal, especially telling children to go away)", "example": "The teacher told the children to _____ and play outside.", "options":["along","away","off","by"]}]}, {"id": "come", "label": "COME", "color": "#4a7fb5", "items": [{"particle": "up with", "meaning": "to think of an idea or plan", "example": "We need to _____ a solution to this problem by tomorrow.", "options":["up with","back","about","across"]}, {"particle": "back", "meaning": "to return; to become fashionable again", "example": "What time will you _____ from your trip to Paris tomorrow?", "options":["back","up with","about","across"]}, {"particle": "about", "meaning": "to happen or occur", "example": "It's still unclear how the confusion _____ in the first place.", "options":["about","across","along","up"]}, {"particle": "across", "meaning": "to find by chance", "example": "I _____ an old photo album while cleaning the attic.", "options":["across","about","along","up"]}, {"particle": "along", "meaning": "to arrive or progress", "example": "The new project should _____ well if we keep working hard.", "options":["along","about","around","up"]}, {"particle": "around", "meaning": "to change one's opinion or recover consciousness", "example": "It usually takes him a while to _____ after an argument.", "options":["around","along","about","at"]}, {"particle": "at", "meaning": "to attack or approach aggressively", "example": "The dog suddenly began to _____ the mailman aggressively.", "options":["at","away","around","off"]}, {"particle": "away", "meaning": "to depart from a place or leave with an impression", "example": "I _____ from the meeting with a much better understanding.", "options":["away","at","off","out"]}, {"particle": "down", "meaning": "to fall or be reduced", "example": "Prices are expected to _____ sharply next year.", "options":["down","up","off","out"]}, {"particle": "in", "meaning": "to enter", "example": "Please _____ and take a seat by the fire.", "options":["in","out","off","up"]}, {"particle": "off", "meaning": "to succeed or detach", "example": "Did the plan actually _____ in the end?", "options":["off","out","down","up"]}, {"particle": "out", "meaning": "to be released or revealed", "example": "The truth will eventually _____, no matter how well hidden.", "options":["out","off","up","in"]}, {"particle": "up", "meaning": "to arise or approach", "example": "An unexpected problem seems to _____ every time we plan a trip.", "options":["up","up with","out","in"]}, {"particle": "over", "meaning": "(of a feeling) to suddenly affect someone; to visit informally", "example": "A strange feeling of calm seemed to _____ her as she waited for the results.", "options":["over","through","about","down"]}, {"particle": "with", "meaning": "to be included as part of something", "example": "The new phone _____ a two-year warranty as standard.", "options":["with","for","against","about"]}, {"particle": "through", "meaning": "to survive a difficult situation successfully; to arrive (of a message)", "example": "The company managed to _____ the crisis without any job losses.", "options":["through","over","out","up"]}, {"particle": "for", "meaning": "to criticize or attack someone (informal)", "example": "Critics have started to _____ the minister over his handling of the crisis.", "options":["for","against","at","with"]}, {"particle": "against", "meaning": "to encounter opposition or a problem", "example": "The proposal is likely to _____ strong opposition from residents.", "options":["against","for","at","around"]}]}, {"id": "bring", "label": "BRING", "color": "#b06a2c", "items": [{"particle": "up", "meaning": "to raise children; to mention a topic", "example": "She didn't want to _____ the subject during dinner with guests.", "options":["up","about","across","after"]}, {"particle": "about", "meaning": "to cause something to happen", "example": "The new policies will _____ significant changes in education.", "options":["about","up","across","after"]}, {"particle": "back", "meaning": "to return something; to reintroduce; to make someone remember", "example": "The old photographs really _____ happy memories of my childhood.", "options":["back","down","up","out"]}, {"particle": "down", "meaning": "to cause to fall or be reduced; to cause the failure of a government", "example": "Rising unemployment could eventually _____ the government.", "options":["down","back","up","off"]}, {"particle": "forward", "meaning": "to move to an earlier time; to propose for consideration", "example": "The committee has decided to _____ the meeting to next Monday.", "options":["forward","back","down","in"]}, {"particle": "in", "meaning": "to introduce a law or policy; to earn income", "example": "The new law will _____ stricter penalties for offenders.", "options":["in","out","up","down"]}, {"particle": "off", "meaning": "to succeed in achieving something difficult", "example": "Nobody thought the team could _____ such a difficult victory.", "options":["off","out","up","about"]}, {"particle": "out", "meaning": "to launch a product; to emphasize a quality; to publish", "example": "The company plans to _____ a new smartphone model next spring.", "options":["out","off","in","up"]}, {"particle": "round", "meaning": "to persuade someone to agree; to revive someone from unconsciousness", "example": "It took the doctors several minutes to _____ the patient after the accident.", "options":["round","back","about","together"]}, {"particle": "together", "meaning": "to unite people or things", "example": "The festival aims to _____ people from many different cultures.", "options":["together","round","in","about"]}]}, {"id": "carry", "label": "CARRY", "color": "#1a8f5e", "items": [{"particle": "out", "meaning": "to perform or complete a task", "example": "Scientists will _____ experiments to test the new drug's safety.", "options":["out","about","across","after"]}, {"particle": "on", "meaning": "to continue doing something", "example": "Despite the setback, the team decided to _____ with the project.", "options":["on","through","forward","away"]}, {"particle": "over", "meaning": "to postpone to a later time; to transfer to a new situation", "example": "Any unused holiday days will _____ into the new year.", "options":["over","forward","back","through"]}, {"particle": "through", "meaning": "to complete something despite difficulties", "example": "It takes real determination to _____ such an ambitious plan.", "options":["through","on","over","off"]}, {"particle": "away", "meaning": "to become extremely excited or emotional, losing self-control", "example": "The crowd got completely _____ by the excitement of the final goal.", "options":["away","off","along","over"]}, {"particle": "off", "meaning": "to successfully manage or achieve something difficult; to win a prize", "example": "She managed to _____ the difficult role with real confidence.", "options":["off","away","on","through"]}, {"particle": "forward", "meaning": "to transfer a total or balance to the next stage or page", "example": "Please _____ the remaining balance to next month's accounts.", "options":["forward","over","back","on"]}, {"particle": "back", "meaning": "to remind someone of an earlier time", "example": "That old song can really _____ the whole audience to their student days.", "options":["back","forward","along","away"]}, {"particle": "along", "meaning": "to keep someone engaged or moving with something", "example": "The rhythm of the music seemed to _____ everyone on the dance floor.", "options":["along","away","back","on"]}]}, {"id": "work", "label": "WORK", "color": "#7b5ea7", "items": [{"particle": "out", "meaning": "to exercise; to solve; to develop successfully", "example": "I need to _____ at the gym more regularly to stay fit.", "options":["out","about","across","after"]}, {"particle": "on", "meaning": "to spend time fixing or improving something", "example": "She plans to _____ her presentation before tomorrow's meeting.", "options":["on","through","up","off"]}, {"particle": "through", "meaning": "to deal with a tough problem or strong feeling step by step", "example": "It will take time to _____ such complicated grief.", "options":["through","on","around","off"]}, {"particle": "off", "meaning": "to get rid of stress, extra weight, or energy through activity", "example": "He likes to _____ stress at the gym after work.", "options":["off","up","on","through"]}, {"particle": "up", "meaning": "to build or develop something over time, like an appetite or courage", "example": "The long walk really helped to _____ my appetite before dinner.", "options":["up","off","on","around"]}, {"particle": "around", "meaning": "to find a way to bypass a problem or obstacle", "example": "Engineers found a clever way to _____ the design flaw.", "options":["around","through","on","up"]}]}, {"id": "figure", "label": "FIGURE", "color": "#c2681f", "items": [{"particle": "out", "meaning": "to understand or solve", "example": "Can you help me _____ this math problem? I'm completely stuck.", "options":["out","about","across","after"]}]}, {"id": "fill", "label": "FILL", "color": "#3d9e95", "items": [{"particle": "in", "meaning": "to complete a form; to substitute; to inform", "example": "Please _____ this application form and return it by Friday.", "options":["in","about","across","after"]}]}, {"id": "call", "label": "CALL", "color": "#c08b2f", "items": [{"particle": "off", "meaning": "to cancel; to order to stop attacking", "example": "They had to _____ the football match because of heavy rain.", "options":["off","back","up","about"]}, {"particle": "back", "meaning": "to return a phone call; to ask to return", "example": "I'll _____ the client later this evening to discuss the arrangements.", "options":["back","off","up","about"]}, {"particle": "up", "meaning": "to telephone; to summon for military service", "example": "Let me _____ my friend who's an expert in this field.", "options":["up","off","back","about"]}]}, {"id": "give", "label": "GIVE", "color": "#6a4374", "items": [{"particle": "up", "meaning": "to stop trying; to surrender", "example": "Don't _____ trying - you can learn anything if you practice enough!", "options":["up","away","about","across"]}, {"particle": "away", "meaning": "to donate; to reveal a secret", "example": "She decided to _____ her old clothes to charity.", "options":["away","up","about","across"]}]}, {"id": "pick", "label": "PICK", "color": "#b4453a", "items": [{"particle": "up", "meaning": "to lift; to collect; to learn; to improve", "example": "Can you _____ some milk from the shop on your way home?", "options":["up","out","about","across"]}, {"particle": "out", "meaning": "to select or identify", "example": "I couldn't _____ my sister from all the people in the crowd.", "options":["out","up","about","across"]}]}, {"id": "drop", "label": "DROP", "color": "#2f5f8e", "items": [{"particle": "off", "meaning": "to deliver; to fall asleep; to decrease", "example": "I'll _____ the kids at school at 8am tomorrow morning.", "options":["off","about","across","after"]}]}, {"id": "set", "label": "SET", "color": "#8f5320", "items": [{"particle": "up", "meaning": "to establish; to arrange; to frame someone", "example": "They're planning to _____ a new business in the city center.", "options":["up","off","out","about"]}, {"particle": "off", "meaning": "to begin a journey; to cause to explode; to enhance by contrast", "example": "What time do you want to _____ for the airport tomorrow morning?", "options":["off","up","out","about"]}, {"particle": "out", "meaning": "to begin a journey; to intend; to arrange systematically", "example": "We _____ to solve the mystery but found no evidence.", "options":["out","up","off","about"]}]}, {"id": "make", "label": "MAKE", "color": "#d1495b", "items": [{"particle": "up", "meaning": "to resolve differences after an argument; to constitute; to invent a story", "example": "The two friends decided to _____ after their argument.", "options":["up","out","over","of"]}, {"particle": "out", "meaning": "to discern or understand with difficulty", "example": "I could barely _____ the handwriting on the old letter.", "options":["out","up","over","of"]}, {"particle": "over", "meaning": "to transfer something formally; to renovate", "example": "The government agreed to _____ the land to the local council.", "options":["over","into","up","off"]}, {"particle": "into", "meaning": "to transform something into something else", "example": "Developers plan to _____ the old railway station a thriving community centre.", "options":["into","over","up","of"]}, {"particle": "for", "meaning": "to result in or contribute to something", "example": "Such low wages and high rents _____ real hardship for many families.", "options":["for","against","of","with"]}, {"particle": "with", "meaning": "to provide or offer something (informal)", "example": "After weeks of criticism, the minister finally _____ an apology.", "options":["with","off","for","at"]}, {"particle": "off", "meaning": "to flee, especially with something stolen", "example": "The burglars managed to _____ before the police arrived.", "options":["off","with","over","at"]}, {"particle": "against", "meaning": "to count against something; to be a factor working against", "example": "Several factors _____ introducing the scheme nationwide.", "options":["against","for","of","at"]}, {"particle": "of", "meaning": "to interpret or understand the significance of something", "example": "It's hard to know what to _____ of the government's latest announcement.", "options":["of","out","up","against"]}, {"particle": "at", "meaning": "to rush or move aggressively toward someone", "example": "The dog suddenly _____ the postman as he opened the gate.", "options":["at","off","with","against"]}]}, {"id": "see", "label": "SEE", "color": "#8a9a5b", "items": [{"particle": "out", "meaning": "to remain until the end of a period or term; to escort someone to the door", "example": "The minister is determined to _____ the remainder of her term in office.", "options":["out","to","off","through"]}, {"particle": "to", "meaning": "to deal with, arrange, or attend to something", "example": "Don't worry about the repairs - I'll _____ it myself.", "options":["to","out","about","for"]}, {"particle": "off", "meaning": "to accompany a departing person; to successfully deal with a challenge", "example": "The champions managed to _____ a determined challenge from their rivals.", "options":["off","out","in","through"]}, {"particle": "in", "meaning": "to celebrate the start of something, like a new year", "example": "Thousands gathered in the square to _____ the new year.", "options":["in","off","out","around"]}, {"particle": "through", "meaning": "to not be deceived by something; to support someone until completion", "example": "Experienced voters can usually _____ empty political promises.", "options":["through","out","over","about"]}, {"particle": "about", "meaning": "to arrange or deal with something", "example": "I'll _____ getting the tickets booked for next week.", "options":["about","to","over","for"]}, {"particle": "over", "meaning": "to be shown around a property", "example": "The estate agent offered to let us _____ the property before we decided.", "options":["over","around","through","about"]}, {"particle": "for", "meaning": "to verify something personally (see for oneself)", "example": "Come and _____ yourself how much progress we've made.", "options":["for","to","about","against"]}, {"particle": "around", "meaning": "to be shown around a place", "example": "Visitors are welcome to _____ the historic building during the open weekend.", "options":["around","over","in","against"]}, {"particle": "against", "meaning": "to evaluate or interpret something in a wider context", "example": "Analysts should always _____ these figures the wider economic background.", "options":["against","for","over","about"]}]}]}</script>
+<div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+
+<div class="bottom-bar">
+  <div class="score-row">
+    <div class="score-item"><div class="score-dot ok"></div><span class="score-num" id="scoreOk">0</span></div>
+    <div class="score-item"><div class="score-dot bad"></div><span class="score-num" id="scoreErr">0</span></div>
+  </div>
+  <button class="check-btn" id="checkBtn" onclick="handleCheck()">Check</button>
+  <div class="auto-row" id="autoRow">
+    <span class="auto-label">Auto</span>
+    <div class="switch"></div>
+  </div>
+</div>
+
+<!-- RESULTS OVERLAY -->
+<div class="overlay" id="overlay">
+  <canvas id="confettiCanvas" style="position:fixed;inset:0;pointer-events:none;z-index:0;"></canvas>
+  <div class="ov-inner">
+    <div class="ov-perfect" id="ovPerfect">✦ Perfect Score ✦</div>
+    <div class="ov-title" id="ovTitle">Done</div>
+    <div class="ov-score" id="ovScore"></div>
+    <div class="ov-stars" id="ovStars"></div>
+    <div class="ov-bars" id="ovBars"></div>
+    <div class="ov-msg" id="ovMsg"></div>
+    <!-- Answer list -->
+    <div class="ov-answers" id="ovAnswers"></div>
+    <div class="ov-btns">
+      <button class="ov-btn primary" onclick="restart()">↺ Retry</button>
+      <button class="ov-btn ghost" onclick="closeOverlay()">Review</button>
+    </div>
+  </div>
+</div>
+
+<!-- Award popup for perfect score -->
+<div class="award-popup" id="awardPopup">
+  <div class="award-inner">🏆</div>
+</div>
+
+<div class="streak-flash" id="streakFlash"></div>
 
 <script>
-/* ======================================================================
-   INCOMING — engine v2
-   ---------------------------------------------------------------------
-   Mechanics on top of the original catch-the-word field:
-   - MIX 1..N: the whole set chunked into completable rounds
-   - exposure cap: a phrase is served max 3x per round, then rests
-   - recall gap: a rested phrase returns only after ~20 other targets
-   - 2-minute round clock
-   - 5-stage CROWNship, derived from mixes cleared + a final trial
-====================================================================== */
+const DATA_URL = 'phrasal-verbs-data.json';
+const GAME_DATA_URL = 'game-data.json';
+const AUTO_MS  = 5500;
 
-const DATA = JSON.parse(document.getElementById('verbData').textContent);
+/* ── STATE ── */
+let verbs     = [];          // all verb groups from JSON
+let verbIdx   = 0;           // active verb index
+let slides    = [];          // built slide list for active verb + mode
+let current   = 0;
+let prev      = -1;
+let mode      = 'quiz';      // opens in Quiz mode — more engaging on first visit
+let autoOn    = false;
+let autoTimer = null;
+let xray      = false;
+let xrayDone  = false;
+let longTimer = null;
+let busy      = false;
+let results   = {};          // key: `verbIdx_itemIndex` → 'ok'|'err'
+let scoreOk   = 0;
+let scoreErr  = 0;
+let streak    = 0;
+let answered  = false;
+let gapChecked = false;
+let reviewMode = false;
 
-/* ---------- flatten ---------- */
-const FULL_POOL = [];
-DATA.verbs.forEach(v => {
-  v.items.forEach(it => {
-    const phrase = (v.id + ' ' + it.particle).toUpperCase();
-    const phraseLower = (v.id + ' ' + it.particle).toLowerCase();
-    const sentence = it.example.replace(/_+/, phraseLower);
-    FULL_POOL.push({ p: phrase, m: it.meaning, s: sentence, verb: v.id, verbLabel: v.label, color: v.color });
+/* ── MATCH MODE STATE ── */
+let gameRounds  = [];
+let gameLoaded  = false;
+let roundIdx    = 0;
+let roundResults = {};   // roundIdx -> 'perfect'
+let matchSelectedId = null;   // id of the currently-selected chip in this round
+let matchAnswers = {};        // slotId -> chipId placed there (this round, pre-check)
+let matchChecked = false;     // has this round been checked/scored
+
+/* ── LOAD ── */
+async function loadAll() {
+  const data = await fetch(DATA_URL).then(r => r.json());
+  verbs = data.verbs;
+  buildTabs();
+  applyVerbTheme();
+  applyModeAccent();
+  build();
+  document.getElementById('loadingScreen').classList.add('fade');
+  setTimeout(() => {
+    document.getElementById('loadingScreen').style.display = 'none';
+    paint();
+    show(0, 'none');
+    updateModeBadges();
+  }, 600);
+}
+
+/* ── STABLE ITEM KEY ── (index-based, not particle text — avoids collisions
+   when two items in the same verb share a particle, and survives shuffles) */
+function itemKey(vIdx, item) {
+  return vIdx + '_' + verbs[vIdx].items.indexOf(item);
+}
+
+/* ── TABS ── */
+function buildTabs() {
+  const wrap = document.getElementById('verbTabs');
+  wrap.innerHTML = '';
+  verbs.forEach((v, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'vtab' + (i === verbIdx ? ' active' : '');
+    btn.textContent = v.label;
+    btn.style.setProperty('--verb-color', v.color);
+    btn.style.setProperty('--verb-rgb', v.colorRgb);
+    btn.addEventListener('click', e => { e.stopPropagation(); switchVerb(i); });
+    wrap.appendChild(btn);
   });
-});
-const VERB_FAMILIES = DATA.verbs.map(v => ({ id: v.id, label: v.label, color: v.color, count: v.items.length }));
-
-/* ---------- verb families are the practice unit ---------- */
-const N_VERBS = VERB_FAMILIES.length;
-
-/* ---------- exam revision: round-robin across every family ---------- */
-/* Study-by-verb mixes are chunked in family order, so a kid working through
-   them still drills one verb at a time. Revision sets do the opposite: take
-   one item from TAKE, one from GO, one from LOOK... cycle through all 21
-   families, then repeat — so a kid who never picks a specific verb still
-   gets even, shuffled exposure to everything, deterministically (not
-   re-randomised per visit, so progress on "Revision 3" always means the
-   same set of phrases). */
-const byVerb = {};
-FULL_POOL.forEach(it => { (byVerb[it.verb] = byVerb[it.verb] || []).push(it); });
-const familyIds = VERB_FAMILIES.map(f => f.id);
-const INTERLEAVED = [];
-for (let row = 0; INTERLEAVED.length < FULL_POOL.length; row++) {
-  familyIds.forEach(fid => { const arr = byVerb[fid]; if (arr[row]) INTERLEAVED.push(arr[row]); });
-}
-const N_REVISION = 5;
-const REV_SIZE = Math.ceil(INTERLEAVED.length / N_REVISION);
-const REVISION_MIXES = [];
-for (let i = 0; i < INTERLEAVED.length; i += REV_SIZE) REVISION_MIXES.push(INTERLEAVED.slice(i, i + REV_SIZE));
-
-/* ---------- rules ---------- */
-const EXPOSURE_CAP = 3;         // a phrase is target at most 3x per round before resting
-const REST_SPAWNS = 20;         // spawns before a rested phrase is eligible again
-const ROUND_SECONDS = 120;      // 2-minute round
-const CLEAR_THRESHOLD = 0.60;   // accuracy needed to clear a mix
-const TRIAL_THRESHOLD = 0.75;   // accuracy needed to earn the Crown
-
-/* ---------- stage ladder ---------- */
-const STAGES = [
-  { key:'spark', label:'Spark', color:'var(--s0)', glow:'var(--s0-glow)', desc:'You can spot a phrasal verb when you see one. First verbs cleared.' },
-  { key:'ember', label:'Ember', color:'var(--s1)', glow:'var(--s1-glow)', desc:'The patterns are starting to stick. Keep clearing verbs.' },
-  { key:'flame', label:'Flame', color:'var(--s2)', glow:'var(--s2-glow)', desc:'Recall is getting fast. Halfway through the full set.' },
-  { key:'blaze', label:'Blaze', color:'var(--s3)', glow:'var(--s3-glow)', desc:'Nearly every family in the set is in play. One push to the trial.' },
-  { key:'crown', label:'Crown', color:'var(--s4)', glow:'var(--s4-glow)', desc:'Every verb cleared and the Final Trial passed. Full mastery.' },
-];
-function stageThresholds(){
-  const s2 = Math.max(1, Math.ceil(N_VERBS * 0.2));
-  const s3 = Math.max(s2 + 1, Math.ceil(N_VERBS * 0.45));
-  const s4 = Math.max(s3 + 1, Math.ceil(N_VERBS * 0.75));
-  return [0, s2, s3, s4, N_VERBS];
-}
-const THRESH = stageThresholds();
-
-/* ---------- persistence ---------- */
-function makeStore(key){
-  let mem = null, usable = true;
-  try { localStorage.setItem('__probe__','1'); localStorage.removeItem('__probe__'); } catch(e){ usable = false; }
-  return {
-    read(){ if(!usable) return mem; try{ const r = localStorage.getItem(key); return r ? JSON.parse(r) : null; } catch(e){ return null; } },
-    write(d){ mem = d; if(!usable) return; try{ localStorage.setItem(key, JSON.stringify(d)); } catch(e){ usable = false; } }
-  };
-}
-const store = makeStore('incoming.progress.v2');
-let progress = store.read() || { verbResults:{}, revResults:{}, phraseStats:{}, trialPassed:false, trialBest:0, seenStage:0 };
-if (!progress.revResults) progress.revResults = {};
-if (!progress.verbResults) progress.verbResults = {}; // players upgrading from the old per-mix version start fresh here
-function saveProgress(){ store.write(progress); }
-function pstat(p){ if(!progress.phraseStats[p]) progress.phraseStats[p] = { hits:0, misses:0 }; return progress.phraseStats[p]; }
-function clearedCount(){ return Object.values(progress.verbResults).filter(r => r.cleared).length; }
-function currentStageIndex(){
-  const c = clearedCount();
-  if (c >= THRESH[4] && progress.trialPassed) return 4;
-  if (c >= THRESH[3]) return 3;
-  if (c >= THRESH[2]) return 2;
-  if (c >= THRESH[1]) return 1;
-  return 0;
-}
-function familyMastered(verbId){
-  const items = FULL_POOL.filter(it => it.verb === verbId);
-  return items.every(it => (progress.phraseStats[it.p]?.hits || 0) > 0);
 }
 
-/* ---------- icon svgs (inline paths, reused per stage) ---------- */
-const FLAME_PATH = "M12 2c.4 2.6-1 4-2.4 5.6C8.2 9.3 7 11 7 13.2A5 5 0 0 0 12 18a5 5 0 0 0 5-4.8c0-1.6-.7-2.7-1.6-3.7.2 1.4-.3 2.3-1 2.9.3-2.6-1-4-1.6-5.5C12.4 5.6 12.3 3.7 12 2z";
-const CROWN_PATH = "M2 18l3-11 5 4 4-7 4 7 5-4 3 11H2z";
-function svgIcon(stageIdx, colorVar){
-  const c = colorVar || `var(--s${stageIdx})`;
-  if (stageIdx === 0) return `<circle cx="12" cy="12" r="4.5" fill="${c}"/>`;
-  if (stageIdx === 1) return `<circle cx="12" cy="12" r="5" fill="${c}"/><circle cx="12" cy="12" r="8" fill="none" stroke="${c}" stroke-opacity=".35"/>`;
-  if (stageIdx === 4) return `<path d="${CROWN_PATH}" fill="${c}"/><circle cx="6" cy="9" r="1" fill="${c}"/><circle cx="18" cy="9" r="1" fill="${c}"/><circle cx="12" cy="6" r="1" fill="${c}"/>`;
-  return `<path d="${FLAME_PATH}" fill="${c}"/>`;
+function applyVerbTheme() {
+  const v = verbs[verbIdx];
+  document.documentElement.style.setProperty('--verb-color', v.color);
+  document.documentElement.style.setProperty('--verb-rgb', v.colorRgb);
 }
 
-/* ---------- shared dom refs ---------- */
-const $ = id => document.getElementById(id);
-const rand = (a,b) => a + Math.random()*(b-a);
-const pick = arr => arr[(Math.random()*arr.length)|0];
-const shuffle = a => { const b=[...a]; for(let i=b.length-1;i>0;i--){const j=(Math.random()*(i+1))|0; [b[i],b[j]]=[b[j],b[i]];} return b; };
-const randInt = (a,b) => a + Math.floor(Math.random()*(b-a+1));
-
-/* ======================================================================
-   MENU RENDER
-====================================================================== */
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  $(id).classList.add('active');
+function switchVerb(i) {
+  verbIdx = i;
+  current = 0; prev = -1; answered = false; gapChecked = false;
+  // Clear per-verb results so previous runs never bleed into new session
+  reviewMode = false;
+  results = {}; scoreOk = 0; scoreErr = 0; streak = 0;
+  document.getElementById('scoreOk').textContent  = 0;
+  document.getElementById('scoreErr').textContent = 0;
+  document.querySelectorAll('.vtab').forEach((b, j) => b.classList.toggle('active', j === i));
+  applyVerbTheme();
+  build(); paint(); show(0, 'none'); resetAuto();
+  updateCheckBtn(); updateModeBadges();
 }
 
-function renderMenu(){
-  showScreen('menu');
-  const stageIdx = currentStageIndex();
-
-  /* stage bar */
-  const bar = $('stagebar'); bar.innerHTML = '';
-  STAGES.forEach((s, i) => {
-    if (i > 0) {
-      const link = document.createElement('div');
-      link.className = 'stagelink' + (i <= stageIdx ? ' done' : '');
-      bar.appendChild(link);
-    }
-    const node = document.createElement('div');
-    node.className = 'stagenode' + (i < stageIdx ? ' done' : '') + (i === stageIdx ? ' current' : '');
-    node.innerHTML = `<div class="dot"><svg viewBox="0 0 24 24">${svgIcon(i, i <= stageIdx ? `var(--s${i})` : 'rgba(232,230,225,.25)')}</svg></div><div class="lbl">${s.label}</div>`;
-    bar.appendChild(node);
-  });
-
-  const cleared = clearedCount();
-  const cap = $('stagecaption');
-  if (stageIdx < 4) {
-    const nextThresh = THRESH[stageIdx+1];
-    const remain = Math.max(0, nextThresh - cleared);
-    if (stageIdx === 3) {
-      cap.innerHTML = cleared >= N_VERBS ? `All verbs cleared — <b>Final Trial</b> unlocked below.` : `Clear <b>${remain}</b> more verb${remain===1?'':'s'} to unlock the Final Trial.`;
-    } else {
-      cap.innerHTML = `Clear <b>${remain}</b> more verb${remain===1?'':'s'} to reach <b>${STAGES[stageIdx+1].label}</b>.`;
-    }
+/* ── BUILD ── */
+function build() {
+  const verb = verbs[verbIdx];
+  slides = [];
+  if (mode === 'learn') {
+    verb.items.forEach((item, idx) => slides.push({ type: 'learn', idx, item }));
+  } else if (mode === 'quiz') {
+    shuffled(verb.items).forEach((item, idx) => slides.push({ type: 'quiz', idx, item }));
   } else {
-    cap.innerHTML = `<b>Crown</b> reached. Full mastery of the set.`;
+    shuffled(verb.items).forEach((item, idx) => slides.push({ type: 'gap', idx, item }));
+  }
+  current = 0; prev = -1; answered = false; gapChecked = false;
+}
+
+/* ── PAINT DOM ── */
+function paint() {
+  const container = document.getElementById('slidesContainer');
+  const dotNav    = document.getElementById('dotNav');
+
+  container.innerHTML = slides.map((s, i) => {
+    return `<div class="slide" data-idx="${i}">${renderSlideInner(s)}</div>`;
+  }).join('');
+
+  dotNav.innerHTML = slides.map((s, i) => {
+    const key = itemKey(verbIdx, s.item);
+    const r = results[key];
+    let cls = 'dot';
+    if (r === 'ok')  cls += ' ok';
+    if (r === 'err') cls += ' err';
+    return `<div class="${cls}" data-dot="${i}"></div>`;
+  }).join('');
+
+  dotNav.querySelectorAll('.dot').forEach(d =>
+    d.addEventListener('click', e => { e.stopPropagation(); jump(+d.dataset.dot); })
+  );
+
+  attachLearnMaskHandlers();
+}
+
+function renderSlideInner(s) {
+  const { item } = s;
+  if (s.type === 'learn') {
+    return renderLearn(item);
+  } else if (s.type === 'quiz') {
+    return renderQuiz(item);
+  } else {
+    return renderGap(item);
+  }
+}
+
+/* ── LEARN ── */
+function renderLearn(item) {
+  const particleUpper = item.particle.toUpperCase();
+  const verbWord = verbs[verbIdx].id.toUpperCase();
+  const posterHtml = item.example
+    .toUpperCase()
+    .replace('_____', `<span class="verb-word">${verbWord}</span> <span class="particle" data-particle-toggle>${particleUpper}</span>`);
+
+  const wordCount = item.example.split(/\s+/).length;
+  const size = wordCount <= 8 ? 'size-small' : wordCount <= 16 ? 'size-medium' : 'size-large';
+
+  return `
+    <div class="phrase-text ${size}">${posterHtml}</div>
+    <div class="meaning-text">${item.meaning}</div>`;
+}
+
+function attachLearnMaskHandlers() {}
+
+/* ── QUIZ ── */
+function renderQuiz(item) {
+  const opts = shuffled([...item.options]);
+  const wordCount = item.example.split(/\s+/).length;
+  const size = wordCount <= 8 ? 'size-small' : wordCount <= 16 ? 'size-medium' : 'size-large';
+  const verbWord = verbs[verbIdx].id.toUpperCase();
+  const sentHtml = item.example.toUpperCase().replace('_____',
+    `<span class="verb-word">${verbWord}</span> <span class="quiz-blank" id="blankSpan">?</span>`);
+  return `
+    <div class="phrase-text ${size}">${sentHtml}</div>
+    <div class="quiz-opts">
+      ${opts.map((o) => `
+        <button class="qopt" data-opt="${o}" onclick="chooseOpt('${o.replace(/'/g,"\\'")}','${item.particle.replace(/'/g,"\\'")}',this)">
+          ${o.toUpperCase()}
+        </button>`).join('')}
+    </div>
+    <div class="fb-bar" id="fbBar">
+      <span class="fb-icon" id="fbIcon"></span>
+      <span id="fbText" class="fb-text"></span>
+    </div>`;
+}
+
+/* ── GAP ── */
+function renderGap(item) {
+  const wordCount = item.example.split(/\s+/).length;
+  const size = wordCount <= 8 ? 'size-small' : wordCount <= 16 ? 'size-medium' : 'size-large';
+  const verbWord = verbs[verbIdx].id.toUpperCase();
+  const sentHtml = item.example.toUpperCase().replace('_____',
+    `<span class="verb-word">${verbWord}</span> <span class="gap-blank-marker">_____</span>`);
+  return `
+    <div class="phrase-text ${size}">${sentHtml}</div>
+    <div class="gap-input-wrap">
+      <input class="gap-input" id="gapInput" type="text" placeholder="type the particle…"
+        autocomplete="off" autocorrect="off" spellcheck="false"
+        onkeydown="if(event.key==='Enter')handleCheck()">
+      <div class="gap-hint" id="gapHint">type the missing particle — press Check below</div>
+    </div>
+    <div class="fb-bar" id="fbBar">
+      <span class="fb-icon" id="fbIcon"></span>
+      <span id="fbText" class="fb-text"></span>
+    </div>`;
+}
+
+/* ── SHOW ── */
+function show(idx, dir) {
+  if (!slides.length) return;
+  const els  = document.querySelectorAll('.slide');
+  const dots = document.querySelectorAll('.dot');
+
+  if (prev >= 0 && prev !== idx && els[prev]) {
+    els[prev].classList.remove('active');
+    if (dir !== 'none') {
+      els[prev].classList.add('exit-left');
+      setTimeout(() => els[prev]?.classList.remove('exit-left'), 480);
+    }
+  }
+  if (els[idx]) {
+    if (!reviewMode) {
+      els[idx].querySelectorAll('.qopt').forEach(b => {
+        b.classList.remove('correct', 'wrong', 'reveal', 'locked');
+      });
+      const incomingBlank = els[idx].querySelector('.quiz-blank');
+      if (incomingBlank) { incomingBlank.textContent = '?'; incomingBlank.classList.remove('revealed'); }
+      const incomingFb = els[idx].querySelector('.fb-bar');
+      if (incomingFb) incomingFb.classList.remove('show');
+      const incomingInput = els[idx].querySelector('.gap-input');
+      if (incomingInput) { incomingInput.classList.remove('correct','wrong'); incomingInput.disabled = false; incomingInput.value = ''; }
+      const incomingHint = els[idx].querySelector('.gap-hint');
+      if (incomingHint) { incomingHint.textContent = 'type the missing particle — press Check below'; incomingHint.classList.remove('show-answer'); }
+    }
+
+    if (dir === 'forward')  els[idx].style.cssText = 'transform:translateX(60px);opacity:0';
+    else if (dir === 'back') els[idx].style.cssText = 'transform:translateX(-60px);opacity:0';
+    else                     els[idx].style.cssText = '';
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      els[idx].classList.add('active');
+      els[idx].style.cssText = '';
+      if (mode === 'gap') {
+        const inp = els[idx].querySelector('.gap-input');
+        if (inp) setTimeout(() => inp.focus(), 80);
+      }
+    }));
   }
 
-  /* verb grid — this is the whole "study by verb" surface now: tap a verb to
-     drill just its particles, and the card itself carries the mastery signal
-     that used to live in a separate badge shelf above it. */
-  const vgrid = $('verbgrid'); vgrid.innerHTML = '';
-  VERB_FAMILIES.forEach(f => {
-    const res = progress.verbResults[f.id];
-    const mastered = familyMastered(f.id);
-    const card = document.createElement('div');
-    card.className = 'verbcard' + (mastered ? ' mastered' : '');
-    card.style.setProperty('--vcolor', f.color);
-    const stars = res ? starsFor(res.bestAccuracy) : '';
-    card.innerHTML = `
-      <span class="vname">${f.label}</span>
-      <span class="vmeta">${f.count} phrase${f.count===1?'':'s'}${res ? ` · best ${Math.round(res.bestAccuracy*100)}%` : ''}</span>
-      <span class="vstars">${stars}</span>
-    `;
-    card.addEventListener('click', () => startVerb(f.id));
-    vgrid.appendChild(card);
+  dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+  document.getElementById('prevBtn').disabled = idx === 0;
+  document.getElementById('nextBtn').disabled = idx === slides.length - 1;
+
+  const s = slides[idx];
+  document.getElementById('sectionLabel').textContent =
+    s ? (verbs[verbIdx].id + ' ' + s.item.particle).toUpperCase() : '';
+
+  updateProgress();
+  updateCheckBtn();
+  prev = idx; current = idx;
+}
+
+/* ── QUIZ ANSWER ── */
+function chooseOpt(chosen, correct, btn) {
+  if (answered) return;
+  answered = true;
+  const isOk = chosen === correct;
+  const blank = document.getElementById('blankSpan');
+  document.querySelectorAll('.qopt').forEach(b => {
+    b.classList.add('locked');
+    const opt = b.dataset.opt;
+    if (isOk && opt === chosen) b.classList.add('correct');
+    else if (opt === chosen && !isOk) b.classList.add('wrong');
+  });
+  if (blank) {
+    if (isOk) { blank.textContent = correct.toUpperCase(); blank.classList.add('revealed'); }
+  }
+  recordResult(isOk);
+  showFeedback(isOk, correct);
+  if (isOk) setTimeout(() => next(), 1300);
+  else setTimeout(() => next(), 1000);
+}
+
+/* ── GAP CHECK ── */
+function handleCheck() {
+  if (mode !== 'gap' || gapChecked) return;
+  const inp = document.getElementById('gapInput');
+  if (!inp) return;
+  const val = inp.value.trim().toLowerCase();
+  const correct = slides[current].item.particle.toLowerCase();
+  const isOk = val === correct;
+  gapChecked = true;
+  inp.classList.add(isOk ? 'correct' : 'wrong');
+  inp.disabled = true;
+  const hint = document.getElementById('gapHint');
+  if (!isOk && hint) { hint.textContent = 'Not quite — check the results at the end'; hint.classList.remove('show-answer'); }
+  recordResult(isOk);
+  showFeedback(isOk, slides[current].item.particle);
+  document.getElementById('checkBtn').style.display = 'none';
+  if (isOk) setTimeout(() => next(), 1300);
+  else setTimeout(() => next(), 1000);
+}
+
+/* ── RESULTS & FEEDBACK ── */
+function recordResult(isOk) {
+  const key = itemKey(verbIdx, slides[current].item);
+  results[key] = isOk ? 'ok' : 'err';
+  recalcScore();
+  refreshDots();
+  updateProgress();
+  updateModeBadges();
+  if (isOk) { streak++; if (streak > 0 && streak % 3 === 0) showStreak(); }
+  else streak = 0;
+}
+
+function recalcScore() {
+  scoreOk = 0; scoreErr = 0;
+  Object.values(results).forEach(r => { if (r === 'ok') scoreOk++; else if (r === 'err') scoreErr++; });
+  document.getElementById('scoreOk').textContent  = scoreOk;
+  document.getElementById('scoreErr').textContent = scoreErr;
+}
+
+function showFeedback(isOk, particle) {
+  const bar  = document.getElementById('fbBar');
+  const icon = document.getElementById('fbIcon');
+  const text = document.getElementById('fbText');
+  if (!bar) return;
+  bar.classList.add('show');
+  icon.textContent = isOk ? '✓' : '✗';
+  icon.style.color = isOk ? '#4DC98A' : '#E05555';
+  if (isOk) {
+    const verb = verbs[verbIdx];
+    const full = verb.id + ' ' + particle;
+    const meaning = slides[current]?.item?.meaning || '';
+    text.innerHTML = `<strong>${full.toUpperCase()}</strong>${meaning ? ' — ' + meaning : ''}`;
+  } else {
+    text.innerHTML = '<span style="color:rgba(229,229,231,.35);font-size:.82rem">Keep going — review at the end</span>';
+  }
+}
+
+function showStreak() {
+  const el = document.getElementById('streakFlash');
+  const msgs = ['🔥 ' + streak + ' in a row!', '⚡ ' + streak + ' streak!', '✨ ' + streak + ' correct!'];
+  el.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+/* ── NAV ── */
+function next() {
+  if (mode === 'incoming') {
+    if (igCatIdx < igCats.length - 1) {
+      const nextCat = igCats[igCatIdx + 1];
+      const coreCleared = igCoreCategories().every(c => igProgress.catResults[c.key]?.cleared);
+      if (nextCat.kind !== 'trial' || coreCleared) switchIgCat(igCatIdx + 1);
+    }
+    return;
+  }
+  if (mode === 'match') {
+    if (roundIdx < gameRounds.length - 1) switchRound(roundIdx + 1);
+    return;
+  }
+  if (busy) return;
+  if (current >= slides.length - 1) {
+    if (mode !== 'learn') {
+      const allAttempted = slides.every(s => results[itemKey(verbIdx, s.item)]);
+      if (allAttempted) { showResults(); return; }
+    }
+    return;
+  }
+  busy = true; answered = false; gapChecked = false;
+  show(current + 1, 'forward');
+  setTimeout(() => busy = false, 480);
+  resetAuto(); updateCheckBtn();
+}
+function back() {
+  if (mode === 'incoming') {
+    if (igCatIdx > 0) switchIgCat(igCatIdx - 1);
+    return;
+  }
+  if (mode === 'match') {
+    if (roundIdx > 0) switchRound(roundIdx - 1);
+    return;
+  }
+  if (busy || current <= 0) return;
+  busy = true; answered = false; gapChecked = false;
+  show(current - 1, 'back');
+  setTimeout(() => busy = false, 480);
+  resetAuto(); updateCheckBtn();
+}
+function jump(idx) {
+  if (busy) return;
+  busy = true; answered = false; gapChecked = false;
+  show(idx, idx > current ? 'forward' : 'back');
+  setTimeout(() => busy = false, 480);
+  resetAuto(); updateCheckBtn();
+}
+
+/* ── RESULTS OVERLAY (learn/quiz/gap) ── */
+function showResults() {
+  document.getElementById('ovAnswers').style.display = '';
+  document.getElementById('ovBars').style.display = '';
+  const verb = verbs[verbIdx];
+  const total = verb.items.length;
+  let ok = 0;
+  verb.items.forEach(item => {
+    if (results[itemKey(verbIdx, item)] === 'ok') ok++;
+  });
+  const pct = Math.round(ok / total * 100);
+  const perfect = pct === 100;
+
+  document.getElementById('ovTitle').textContent = perfect ? 'Perfect!' : pct >= 80 ? 'Brilliant' : pct >= 60 ? 'Good' : 'Keep Going';
+  document.getElementById('ovScore').textContent  = ok + ' / ' + total + ' · ' + pct + '%';
+  document.getElementById('ovPerfect').classList.toggle('show', perfect);
+
+  const stars = pct >= 90 ? 3 : pct >= 70 ? 2 : pct >= 50 ? 1 : 0;
+  document.getElementById('ovStars').innerHTML = Array.from({length:3},(_,i) =>
+    `<span class="ov-star">${i < stars ? '★' : '☆'}</span>`).join('');
+
+  document.getElementById('ovBars').innerHTML = verb.items.map(item => {
+    const r = results[itemKey(verbIdx, item)];
+    const bg = r === 'ok' ? '#4DC98A' : r === 'err' ? '#E05555' : 'rgba(255,255,255,.1)';
+    return `<div class="ov-bar" style="background:${bg}"></div>`;
+  }).join('');
+
+  document.getElementById('ovMsg').textContent = perfect
+    ? "Absolutely flawless. You've mastered this set!"
+    : pct >= 80 ? 'Excellent. Review the red ones and try again.'
+    : pct >= 60 ? 'Solid work. Try Learn mode on the missed ones.'
+    : 'Go back to Learn mode to build the pattern first.';
+
+  document.getElementById('ovAnswers').innerHTML = verb.items.map((item, i) => {
+    const r = results[itemKey(verbIdx, item)] || 'unanswered';
+    const cls = r === 'ok' ? 'ok' : 'err';
+    const tick = r === 'ok' ? '✓' : '✗';
+    const delay = i * 40;
+    return `<div class="ov-answer-item ${cls}" style="animation-delay:${delay}ms">
+      <span class="ov-answer-verb">${verb.id.toUpperCase()} ${item.particle.toUpperCase()}</span>
+      <span class="ov-answer-meaning">${item.meaning}</span>
+      <span class="ov-answer-tick">${tick}</span>
+    </div>`;
+  }).join('');
+
+  updateTabScore(verbIdx, pct);
+
+  document.getElementById('overlay').classList.add('show');
+
+  if (perfect) {
+    triggerConfetti();
+    setTimeout(() => showAwardPopup(), 300);
+  }
+}
+
+function updateTabScore(idx, pct) {
+  const tabs = document.querySelectorAll('.vtab');
+  if (!tabs[idx]) return;
+  tabs[idx].classList.remove('score-perfect','score-great','score-ok','score-poor');
+  if (pct === 100)      tabs[idx].classList.add('score-perfect');
+  else if (pct >= 80)   tabs[idx].classList.add('score-great');
+  else if (pct >= 50)   tabs[idx].classList.add('score-ok');
+  else                  tabs[idx].classList.add('score-poor');
+}
+
+function showAwardPopup() {
+  const popup = document.getElementById('awardPopup');
+  popup.classList.add('show');
+  setTimeout(() => popup.classList.remove('show'), 2200);
+}
+
+/* ── CONFETTI ── */
+let confettiAnim = null;
+let confettiParticles = [];
+
+function triggerConfetti() {
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  confettiParticles = Array.from({length: 120}, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height - canvas.height,
+    r: Math.random() * 6 + 3,
+    d: Math.random() * 6 + 2,
+    color: ['#C9A961','#FFD060','#4DC98A','#5B9BD5','#c94f6d','#fff'][Math.floor(Math.random()*6)],
+    tilt: Math.random() * 10 - 10,
+    tiltAngle: 0,
+    tiltAngleInc: Math.random() * 0.07 + 0.05
+  }));
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    confettiParticles.forEach(p => {
+      p.tiltAngle += p.tiltAngleInc; p.y += p.d; p.tilt = Math.sin(p.tiltAngle) * 15;
+      if (p.y > canvas.height) { p.y = -20; p.x = Math.random() * canvas.width; }
+      ctx.beginPath(); ctx.lineWidth = p.r / 2; ctx.strokeStyle = p.color;
+      ctx.moveTo(p.x + p.tilt + p.r/4, p.y);
+      ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r/4); ctx.stroke();
+    });
+    confettiAnim = requestAnimationFrame(draw);
+  }
+  draw();
+  setTimeout(stopConfetti, 5000);
+}
+
+function stopConfetti() {
+  if (confettiAnim) { cancelAnimationFrame(confettiAnim); confettiAnim = null; }
+  const canvas = document.getElementById('confettiCanvas');
+  canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function restart() {
+  document.getElementById('overlay').classList.remove('show');
+  stopConfetti();
+
+  if (mode === 'incoming') {
+    beginIgRound(igCats[igCatIdx]);
+    return;
+  }
+
+  if (mode === 'match') {
+    roundResults = {};
+    matchChecked = false; matchAnswers = {}; matchSelectedId = null;
+    buildRoundTabs();
+    renderMatchRound();
+    updateModeBadges();
+    return;
+  }
+
+  reviewMode = false;
+  results = {}; scoreOk = 0; scoreErr = 0; streak = 0;
+  document.getElementById('scoreOk').textContent = 0;
+  document.getElementById('scoreErr').textContent = 0;
+  build(); paint(); show(0, 'none'); resetAuto(); updateCheckBtn(); updateModeBadges();
+}
+
+function closeOverlay() {
+  document.getElementById('overlay').classList.remove('show');
+  stopConfetti();
+  if (mode === 'incoming') return;
+  if (mode === 'match') return; // match round already shows its checked state inline
+  reviewMode = true;
+  paintReview();
+  show(0, 'none');
+  updateCheckBtn();
+}
+
+function paintReview() {
+  const container = document.getElementById('slidesContainer');
+  container.innerHTML = slides.map((s, i) => {
+    return `<div class="slide" data-idx="${i}">${renderReview(s)}</div>`;
+  }).join('');
+  document.querySelectorAll('.dot').forEach(d =>
+    d.addEventListener('click', e => { e.stopPropagation(); jump(+d.dataset.dot); })
+  );
+}
+
+function renderReview(s) {
+  const { item } = s;
+  const key = itemKey(verbIdx, item);
+  const r = results[key];
+  const wordCount = item.example.split(/\s+/).length;
+  const size = wordCount <= 8 ? 'size-small' : wordCount <= 16 ? 'size-medium' : 'size-large';
+  const resultColor = r === 'ok' ? '#4DC98A' : '#E05555';
+  const tick = r === 'ok' ? '✓' : '✗';
+
+  const verbWord = verbs[verbIdx].id.toUpperCase();
+  const sentHtml = item.example.toUpperCase().replace('_____',
+    `<span class="verb-word" style="color:${resultColor}">${verbWord}</span> <span style="color:${resultColor};font-weight:900;text-decoration:underline;text-underline-offset:4px">${item.particle.toUpperCase()}</span>`);
+
+  return `
+    <div class="phrase-text ${size}" style="opacity:.9">${sentHtml}</div>
+    <div style="display:flex;align-items:center;gap:.6rem;margin-top:.2rem">
+      <span style="font-size:1.1rem;color:${resultColor}">${tick}</span>
+      <span style="font-family:'DM Sans',sans-serif;font-size:.82rem;color:rgba(229,229,231,.45);line-height:1.5">${item.meaning}</span>
+    </div>`;
+}
+
+/* ── CHECK BTN (learn/quiz/gap bottom bar) ── */
+function updateCheckBtn() {
+  const btn = document.getElementById('checkBtn');
+  if (mode === 'gap' && !gapChecked) {
+    btn.style.display = '';
+  } else {
+    btn.style.display = 'none';
+  }
+}
+
+/* ── AUTO ── */
+function startAuto() {
+  stopAuto();
+  const fill = document.getElementById('progressFill');
+  fill.style.transition = 'none'; fill.style.width = '0%';
+  requestAnimationFrame(() => {
+    fill.style.transition = `width ${AUTO_MS}ms linear`;
+    fill.style.width = '100%';
+  });
+  autoTimer = setTimeout(() => {
+    if (current < slides.length - 1) {
+      next();
+    } else {
+      const allAttempted = mode === 'learn' || slides.every(s => results[itemKey(verbIdx, s.item)]);
+      if (mode !== 'learn' && allAttempted) {
+        showResults();
+        autoOn = false;
+        document.getElementById('autoRow').classList.remove('on');
+        stopAuto();
+        return;
+      }
+      build(); paint(); show(0, 'none');
+    }
+    if (autoOn) startAuto();
+  }, AUTO_MS);
+}
+function stopAuto() {
+  clearTimeout(autoTimer);
+  const fill = document.getElementById('progressFill');
+  fill.style.transition = 'none'; fill.style.width = '0%';
+}
+function resetAuto() { if (autoOn) startAuto(); }
+function toggleAuto() {
+  if (mode === 'match' || mode === 'incoming') return;
+  autoOn = !autoOn;
+  document.getElementById('autoRow').classList.toggle('on', autoOn);
+  autoOn ? startAuto() : stopAuto();
+}
+
+/* ── X-RAY ── */
+function showXray() {
+  xray = true;
+  document.getElementById('sectionLabel').classList.add('visible');
+  if (!xrayDone) { xrayDone = true; document.getElementById('holdHint').classList.add('hidden'); }
+}
+function hideXray() {
+  xray = false;
+  document.getElementById('sectionLabel').classList.remove('visible');
+}
+
+/* ── MODE ── */
+const MODE_ACCENTS = {
+  learn: { color: null, rgb: null },
+  quiz:  { color: '#FFD94A', rgb: '255,217,74' },
+  gap:   { color: '#A8E063', rgb: '168,224,99' },
+  match: { color: '#FFD94A', rgb: '255,217,74' },
+  incoming: { color: '#FFD94A', rgb: '255,217,74' }
+};
+  const MATCH_ROUND_COLORS = [
+  { color: '#FFD94A', rgb: '255,217,74' },
+  { color: '#7dd3fc', rgb: '125,211,252' },
+  { color: '#c084fc', rgb: '192,132,252' },
+  { color: '#fb923c', rgb: '251,146,60' },
+  { color: '#4DC98A', rgb: '77,201,138' },
+  { color: '#f472b6', rgb: '244,114,182' },
+];
+
+function applyModeAccent() {
+  const a = MODE_ACCENTS[mode];
+  const root = document.documentElement;
+  if (a.color) {
+    root.style.setProperty('--mode-accent',     a.color);
+    root.style.setProperty('--mode-accent-rgb', a.rgb);
+  } else {
+    const v = verbs[verbIdx];
+    root.style.setProperty('--mode-accent',     v.color);
+    root.style.setProperty('--mode-accent-rgb', v.colorRgb);
+  }
+}
+
+async function setMode(m) {
+  const leavingMatch = (mode === 'match' && m !== 'match');
+  const leavingIncoming = (mode === 'incoming' && m !== 'incoming');
+  mode = m;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === m));
+  reviewMode = false;
+  results = {}; scoreOk = 0; scoreErr = 0; streak = 0;
+  document.getElementById('scoreOk').textContent  = 0;
+  document.getElementById('scoreErr').textContent = 0;
+  document.getElementById('checkBtn').style.display = 'none';
+  stopAuto(); autoOn = false;
+  document.getElementById('autoRow').classList.remove('on');
+
+  if (leavingIncoming) stopIgRound();
+
+  if (m === 'match') {
+    document.getElementById('holdHint').classList.add('hidden');
+    document.documentElement.classList.add('match-scroll');
+    document.body.classList.add('match-scroll');
+    document.getElementById('slideCard').classList.add('match-mode');
+    document.getElementById('sectionLabel').classList.remove('visible');
+    document.getElementById('dotNav').innerHTML = '';
+    document.getElementById('progressFill').style.width = '0%';
+  
+    applyModeAccent();
+    await ensureGameData();
+    roundIdx = 0; roundResults = {};
+    matchChecked = false; matchAnswers = {}; matchSelectedId = null;
+    buildRoundTabs();
+    renderMatchRound();
+    updateModeBadges();
+    return;
+  }
+
+  if (m === 'incoming') {
+    document.documentElement.classList.remove('match-scroll');
+    document.body.classList.remove('match-scroll');
+    document.getElementById('holdHint').classList.add('hidden');
+    document.getElementById('slideCard').classList.add('incoming-mode');
+    document.getElementById('sectionLabel').classList.remove('visible');
+    document.getElementById('dotNav').innerHTML = '';
+    document.getElementById('progressFill').style.width = '0%';
+    applyModeAccent();
+    ensureIgCategories();
+    buildIgTabs();
+    switchIgCat(igCatIdx || 0);
+    updateModeBadges();
+    return;
+  }
+
+  if (leavingMatch || leavingIncoming) {
+    document.getElementById('slideCard').classList.remove('match-mode', 'incoming-mode')
+    document.documentElement.classList.remove('match-scroll');
+    document.body.classList.remove('match-scroll');
+    buildTabs();
+    document.querySelectorAll('.vtab').forEach((b, j) => b.classList.toggle('active', j === verbIdx));
+    applyVerbTheme();
+  }
+  applyModeAccent();
+  build(); paint(); show(0, 'none'); resetAuto(); updateCheckBtn(); updateModeBadges();
+}
+
+/* ── MODE BADGES ── */
+function updateModeBadges() {
+  const matchBadge = document.getElementById('badge-match');
+  if (matchBadge) {
+    matchBadge.textContent = gameLoaded ? (mode === 'match' ? (roundIdx + 1) + '/' + gameRounds.length : gameRounds.length) : '–';
+    matchBadge.classList.toggle('live', mode === 'match');
+  }
+  const incBadge = document.getElementById('badge-incoming');
+  if (incBadge) {
+    incBadge.textContent = igLoaded ? (mode === 'incoming' ? (igClearedCount() + '/' + igCoreCategories().length) : igCoreCategories().length) : '–';
+    incBadge.classList.toggle('live', mode === 'incoming');
+  }
+  if (!verbs.length) return;
+  const verb = verbs[verbIdx];
+  const total = verb.items.length;
+  ['learn', 'quiz', 'gap'].forEach(m => {
+    const el = document.getElementById('badge-' + m);
+    if (!el) return;
+    if (m === mode) {
+      const done = verb.items.filter(item => results[itemKey(verbIdx, item)]).length;
+      el.textContent = done + '/' + total;
+      el.classList.add('live');
+    } else {
+      el.textContent = total;
+      el.classList.remove('live');
+    }
+  });
+}
+
+/* ── DOTS ── */
+function refreshDots() {
+  document.querySelectorAll('.dot').forEach((d, i) => {
+    const s = slides[i];
+    if (!s) return;
+    const key = itemKey(verbIdx, s.item);
+    const r = results[key];
+    d.className = 'dot';
+    if (i === current) d.classList.add('active');
+    else if (r === 'ok') d.classList.add('ok');
+    else if (r === 'err') d.classList.add('err');
+  });
+}
+
+/* ── PROGRESS ── */
+function updateProgress() {
+  if (autoOn) return;
+  const verb = verbs[verbIdx];
+  const done = verb.items.filter(item => results[itemKey(verbIdx, item)]).length;
+  document.getElementById('progressFill').style.width = (done / verb.items.length * 100) + '%';
+}
+
+/* ── UTILS ── */
+function shuffled(a) {
+  const b = [...a];
+  for (let i = b.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [b[i], b[j]] = [b[j], b[i]];
+  }
+  return b;
+}
+
+function hexToRgb(hex) {
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return m ? `${parseInt(m[1],16)},${parseInt(m[2],16)},${parseInt(m[3],16)}` : '255,217,74';
+}
+
+/* ── EVENTS ── */
+document.getElementById('prevBtn').addEventListener('click', e => { e.stopPropagation(); back(); });
+document.getElementById('nextBtn').addEventListener('click', e => { e.stopPropagation(); next(); });
+
+const card = document.getElementById('slideCard');
+let tx = 0;
+card.addEventListener('touchstart', e => {
+  if (mode === 'match' || mode === 'incoming') return;
+  tx = e.touches[0].clientX;
+  longTimer = setTimeout(showXray, 400);
+}, {passive: true});
+card.addEventListener('touchend', e => {
+  if (mode === 'match' || mode === 'incoming') return;
+  clearTimeout(longTimer); hideXray();
+  const dx = e.changedTouches[0].clientX - tx;
+  if (Math.abs(dx) > 50) { if (dx < 0) next(); else back(); }
+}, {passive: true});
+card.addEventListener('mousedown', () => { if (mode !== 'match' && mode !== 'incoming') longTimer = setTimeout(showXray, 400); });
+card.addEventListener('mouseup', () => { clearTimeout(longTimer); hideXray(); });
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); back(); }
+  if (e.key === 'a' || e.key === 'A') toggleAuto();
+  if (e.key === 'Enter' && mode === 'gap') handleCheck();
+  if (mode === 'quiz') {
+    if (e.key === '1') clickOpt(0);
+    if (e.key === '2') clickOpt(1);
+    if (e.key === '3') clickOpt(2);
+    if (e.key === '4') clickOpt(3);
+  }
+});
+
+function clickOpt(i) {
+  const opts = document.querySelectorAll('.qopt');
+  if (opts[i] && !opts[i].classList.contains('locked')) opts[i].click();
+}
+
+document.querySelectorAll('.mode-btn').forEach(b =>
+  b.addEventListener('click', e => { e.stopPropagation(); setMode(b.dataset.mode); })
+);
+document.getElementById('autoRow').addEventListener('click', e => { e.stopPropagation(); toggleAuto(); });
+
+
+/* ══════════════════════════════ MATCH MODE ══════════════════════════════
+   Click-to-fill, scored on Check (mirrors the word-choice quiz pattern):
+   1. Tap a phrase chip in the word bank → it's "selected"
+   2. Tap a blank in Column A → the phrase is placed there (pre-check state,
+      shown in the mode accent colour, not yet marked right/wrong)
+   3. Tapping a filled blank again releases that chip back to the bank
+   4. Once every blank has a chip, Check scores the whole round at once and
+      shows the results overlay (reusing the existing overlay UI)
+   Colour: each phrase chip carries its verb-family colour from game-data.json
+   from the start (a grouping cue). Column B (the definition) stays plain
+   throughout — colour only lands on Column A once an answer is placed/checked,
+   so the definition itself must still be read to make the match. */
+
+async function ensureGameData() {
+  if (gameLoaded) return;
+  const data = await fetch(GAME_DATA_URL).then(r => r.json());
+  gameRounds = data.rounds;
+  gameLoaded = true;
+}
+
+/* Round tabs reuse the .vtab strip that normally lists verbs */
+function buildRoundTabs() {
+  const wrap = document.getElementById('verbTabs');
+  wrap.innerHTML = '';
+  gameRounds.forEach((r, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'vtab' + (i === roundIdx ? ' active' : '') + (roundResults[i] === 'perfect' ? ' score-perfect' : '');
+    btn.textContent = 'R' + (i + 1);
+    btn.style.setProperty('--verb-color', '#FFD94A');
+    btn.style.setProperty('--verb-rgb', '255,217,74');
+    btn.addEventListener('click', e => { e.stopPropagation(); switchRound(i); });
+    wrap.appendChild(btn);
+  });
+  wrap.querySelectorAll('.vtab')[roundIdx]?.scrollIntoView({ inline: 'center', block: 'nearest' });
+}
+
+function switchRound(i) {
+  roundIdx = i;
+  matchChecked = false; matchAnswers = {}; matchSelectedId = null;
+  document.querySelectorAll('#verbTabs .vtab').forEach((b, j) => b.classList.toggle('active', j === i));
+  renderMatchRound();
+  updateModeBadges();
+}
+
+function renderMatchRound() {
+  const round = gameRounds[roundIdx];
+  const rc = MATCH_ROUND_COLORS[roundIdx % MATCH_ROUND_COLORS.length];
+  document.documentElement.style.setProperty('--verb-color', rc.color);
+  document.documentElement.style.setProperty('--verb-rgb', rc.rgb);
+  const container = document.getElementById('slidesContainer');
+
+  // Chips: one per pair, colour-coded to its verb family, shuffled.
+  const chips = shuffled(round.pairs);
+  // Rows: meanings in a different shuffled order than the chips so position
+  // never gives the answer away.
+  const rows = shuffled(round.pairs);
+
+  const chipsHtml = chips.map(p => `
+    <button type="button" class="match-chip" data-id="${p.id}"
+      onclick="onChipClick(${p.id}, this)">${p.phrase}</button>`
+  ).join('');
+
+const rowsHtml = rows.map((p, i) => `
+    <div class="match-row" data-row-id="${p.id}">
+      <div class="match-row-num">${i + 1}</div>
+ <div class="match-meaning">${p.meaning} — <span class="match-blank" data-row-id="${p.id}" onclick="onBlankClick(${p.id})"><span class="blank-content">&nbsp;</span></span></div>
+    </div>`).join('');
+
+  container.innerHTML = `
+    <div class="slide active match-slide"> 
+      <div class="match-round-label">ROUND ${roundIdx + 1} / ${gameRounds.length}</div>
+      <div class="match-bank">${chipsHtml}</div>
+      <div class="match-rows">${rowsHtml}</div>
+    </div>`;
+
+  document.getElementById('prevBtn').disabled = roundIdx === 0;
+  document.getElementById('nextBtn').disabled = roundIdx === gameRounds.length - 1;
+  document.getElementById('sectionLabel').textContent = 'MATCH ROUND ' + (roundIdx + 1);
+
+  updateMatchProgress();
+}
+
+function currentPairs() {
+  return gameRounds[roundIdx].pairs;
+}
+
+function onChipClick(id, btn) {
+  if (matchChecked) return;
+  if (btn.classList.contains('used')) return;
+
+  if (matchSelectedId === id) {
+    // tapping the already-selected chip deselects it
+    matchSelectedId = null;
+    btn.classList.remove('selected');
+    return;
+  }
+
+  document.querySelectorAll('.match-chip.selected').forEach(c => c.classList.remove('selected'));
+  matchSelectedId = id;
+  btn.classList.add('selected');
+}
+
+function onBlankClick(rowId) {
+  if (matchChecked) return;
+  const blank = document.querySelector(`.match-blank[data-row-id="${rowId}"]`);
+  if (!blank) return;
+
+  // Blank already filled → release it back to the bank
+  if (matchAnswers[rowId] !== undefined) {
+    const releasedId = matchAnswers[rowId];
+    delete matchAnswers[rowId];
+    const chip = document.querySelector(`.match-chip[data-id="${releasedId}"]`);
+    if (chip) chip.classList.remove('used');
+    blank.classList.remove('filled');
+    blank.style.removeProperty('--row-color');
+    blank.querySelector('.blank-content').innerHTML = '_____';
+    updateMatchProgress();
+    updateMatchCheckBtn();
+    return;
+  }
+
+  // No chip selected — nudge, nothing to place
+  if (matchSelectedId === null) return;
+
+  const chip = document.querySelector(`.match-chip[data-id="${matchSelectedId}"]`);
+  const pair = currentPairs().find(p => p.id === matchSelectedId);
+  if (!chip || !pair) return;
+
+  matchAnswers[rowId] = matchSelectedId;
+  chip.classList.remove('selected');
+  chip.classList.add('used');
+  matchSelectedId = null;
+
+  blank.classList.add('filled');
+  blank.querySelector('.blank-content').textContent = pair.phrase;
+
+  updateMatchProgress();
+  if (Object.keys(matchAnswers).length === currentPairs().length) {
+    setTimeout(checkMatchRound, 250);
+  }
+}
+
+function updateMatchCheckBtn() {
+  const btn = document.getElementById('matchCheckBtn');
+  if (!btn) return;
+  const total = currentPairs().length;
+  const filled = Object.keys(matchAnswers).length;
+  btn.disabled = filled < total || matchChecked;
+}
+
+function updateMatchProgress() {
+  const total = currentPairs().length;
+  const filled = Object.keys(matchAnswers).length;
+  document.getElementById('progressFill').style.width = (filled / total * 100) + '%';
+}
+
+/* ── SCORE THE WHOLE ROUND AT ONCE ── */
+function checkMatchRound() {
+  if (matchChecked) return;
+  const pairs = currentPairs();
+  const total = pairs.length;
+  if (Object.keys(matchAnswers).length < total) return;
+
+  matchChecked = true;
+  let ok = 0;
+
+  pairs.forEach(p => {
+    const blank = document.querySelector(`.match-blank[data-row-id="${p.id}"]`);
+    const placedId = matchAnswers[p.id];
+    const isOk = placedId === p.id;
+    if (isOk) ok++;
+    blank.classList.add(isOk ? 'result-ok' : 'result-err');
+    if (!isOk) {
+      const placedPair = pairs.find(x => x.id === placedId);
+      blank.innerHTML = `<span class="blank-content">${placedPair ? placedPair.phrase : '?'}</span><span class="reveal-answer">${p.phrase}</span>`;
+    }
   });
 
-  /* revision grid */
-  const revgrid = $('revgrid'); revgrid.innerHTML = '';
-  REVISION_MIXES.forEach((mix, i) => {
-    const res = progress.revResults[i];
-    const card = document.createElement('div');
-    card.className = 'mixcard unlocked';
-    const stars = res ? starsFor(res.bestAccuracy) : '';
-    card.innerHTML = `
-      <span class="num">REVISION ${i+1}</span>
-      <span class="name">${mix.length} phrases</span>
-      <span class="stars">${stars}</span>
-      ${res ? `<span class="pct">best ${Math.round(res.bestAccuracy*100)}%</span>` : ''}
-    `;
-    card.addEventListener('click', () => startRevision(i));
-    revgrid.appendChild(card);
+  document.querySelectorAll('.match-chip').forEach(c => c.classList.add('used'));
+
+  scoreOk = ok; scoreErr = total - ok;
+  document.getElementById('scoreOk').textContent = scoreOk;
+  document.getElementById('scoreErr').textContent = scoreErr;
+
+  const pct = Math.round(ok / total * 100);
+  roundResults[roundIdx] = pct === 100 ? 'perfect' : (pct >= 50 ? 'ok' : 'poor');
+  buildRoundTabs();
+
+  showMatchResults(ok, total, pct, pairs);
+}
+
+function showMatchResults(ok, total, pct, pairs) {
+  document.getElementById('ovAnswers').style.display = '';
+  document.getElementById('ovBars').style.display = '';
+  const perfect = pct === 100;
+
+  document.getElementById('ovTitle').textContent = perfect ? 'Perfect!' : pct >= 80 ? 'Brilliant' : pct >= 60 ? 'Good' : 'Keep Going';
+  document.getElementById('ovScore').textContent  = ok + ' / ' + total + ' · ' + pct + '%';
+  document.getElementById('ovPerfect').classList.toggle('show', perfect);
+
+  const stars = pct >= 90 ? 3 : pct >= 70 ? 2 : pct >= 50 ? 1 : 0;
+  document.getElementById('ovStars').innerHTML = Array.from({length:3},(_,i) =>
+    `<span class="ov-star">${i < stars ? '★' : '☆'}</span>`).join('');
+
+  document.getElementById('ovBars').innerHTML = pairs.map(p => {
+    const isOk = matchAnswers[p.id] === p.id;
+    return `<div class="ov-bar" style="background:${isOk ? '#4DC98A' : '#E05555'}"></div>`;
+  }).join('');
+
+  document.getElementById('ovMsg').textContent = perfect
+    ? "Absolutely flawless. You've mastered this round!"
+    : pct >= 80 ? 'Excellent. Review the red ones and try again.'
+    : pct >= 60 ? 'Solid work — a few mixed up.'
+    : 'Worth another pass on this round.';
+
+  document.getElementById('ovAnswers').innerHTML = pairs.map((p, i) => {
+    const isOk = matchAnswers[p.id] === p.id;
+    const cls = isOk ? 'ok' : 'err';
+    const tick = isOk ? '✓' : '✗';
+    const delay = i * 40;
+    return `<div class="ov-answer-item ${cls}" style="animation-delay:${delay}ms">
+      <span class="ov-answer-verb">${p.phrase}</span>
+      <span class="ov-answer-meaning">${p.meaning}</span>
+      <span class="ov-answer-tick">${tick}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('overlay').classList.add('show');
+
+  if (perfect) {
+    triggerConfetti();
+    setTimeout(() => showAwardPopup(), 300);
+  }
+}
+
+/* ══════════════════════════ INCOMING — GAME MODE ══════════════════════════
+   Falling-word matching game, integrated as a 5th mode. Categories:
+   - each verb with >=6 particles is a standalone category tab
+   - verbs with <5 particles merge into MIX 1, MIX 2 ... in original order
+   - 5 PRACTICE sets interleave every verb round-robin (revision drilling)
+   - TRIAL unlocks once every standalone verb + every mix is cleared
+   Progress persists via localStorage with an in-memory fallback, same
+   feature-detection pattern as the original engine used. Categories reuse
+   the .vtab header strip (like Match's round tabs) and the falling field
+   lives inside the same slide-card / overlay chrome as every other mode. */
+
+const IG_EXPOSURE_CAP = 3, IG_REST_SPAWNS = 20, IG_ROUND_SECONDS = 120;
+const IG_CLEAR_THRESHOLD = 0.60, IG_TRIAL_THRESHOLD = 0.75;
+const IG_STAGES = [
+  { label: 'Spark', color: '#cdbf8e' }, { label: 'Ember', color: '#e8935a' },
+  { label: 'Flame', color: '#ff7a45' }, { label: 'Blaze', color: '#ff4d4d' },
+  { label: 'Crown', color: '#ffd94a' },
+];
+
+let igCats = [], igAllItems = [], igCatIdx = 0, igLoaded = false, igProgress = null, igRound = null;
+
+let igStoreUsable = true, igStoreMem = null;
+try { localStorage.setItem('__ig_probe__','1'); localStorage.removeItem('__ig_probe__'); } catch(e){ igStoreUsable = false; }
+function igStoreRead(){
+  if (!igStoreUsable) return igStoreMem;
+  try { const r = localStorage.getItem('intuity.incoming.progress.v1'); return r ? JSON.parse(r) : null; } catch(e){ return null; }
+}
+function igStoreWrite(d){
+  igStoreMem = d;
+  if (!igStoreUsable) return;
+  try { localStorage.setItem('intuity.incoming.progress.v1', JSON.stringify(d)); } catch(e){ igStoreUsable = false; }
+}
+function igPstat(p){ if (!igProgress.phraseStats[p]) igProgress.phraseStats[p] = { hits: 0, misses: 0 }; return igProgress.phraseStats[p]; }
+
+function igRand(a,b){ return a + Math.random()*(b-a); }
+function igPick(arr){ return arr[(Math.random()*arr.length)|0]; }
+function igRandInt(a,b){ return a + Math.floor(Math.random()*(b-a+1)); }
+
+function ensureIgCategories(){
+  if (igLoaded) return;
+  buildIgCategories();
+  igProgress = igStoreRead() || { catResults: {}, phraseStats: {}, trialPassed: false, trialBest: 0 };
+  igLoaded = true;
+}
+
+function igMakeItem(v, it){
+  const phrase = (v.id + ' ' + it.particle).toUpperCase();
+  const phraseLower = (v.id + ' ' + it.particle).toLowerCase();
+  const sentence = it.example.replace(/_+/, phraseLower);
+  return { p: phrase, m: it.meaning, s: sentence, verb: v.id, verbLabel: v.label, color: v.color };
+}
+
+function buildIgCategories(){
+  igCats = [];
+  const STANDALONE_MIN = 6; // >=6 particles stays its own category; fewer merges into a MIX
+  const standalone = [], smallOnes = [];
+  verbs.forEach(v => (v.items.length >= STANDALONE_MIN ? standalone : smallOnes).push(v));
+
+  // chunk the small verbs, in original data order, into ~6-7 item MIX groups
+  const mixGroups = []; let cur = [], curCount = 0;
+  smallOnes.forEach(v => {
+    if (curCount > 0 && curCount + v.items.length > 8) { mixGroups.push(cur); cur = []; curCount = 0; }
+    cur.push(v); curCount += v.items.length;
+  });
+  if (cur.length) mixGroups.push(cur);
+
+  standalone.forEach(v => {
+    igCats.push({ key: 'verb_'+v.id, kind: 'verb', label: v.label, color: v.color, colorRgb: v.colorRgb || hexToRgb(v.color), pool: v.items.map(it => igMakeItem(v,it)) });
+  });
+  mixGroups.forEach((group,i) => {
+    const pool = [];
+    group.forEach(v => v.items.forEach(it => pool.push(igMakeItem(v,it))));
+    igCats.push({ key: 'mix_'+i, kind: 'mix', label: 'MIX '+(i+1), color: '#FFD94A', colorRgb: '255,217,74', pool });
   });
 
-  /* trial card */
-  const allCleared = cleared >= N_VERBS;
-  const tc = $('trialcard');
-  tc.classList.toggle('locked', !allCleared);
-  $('trialIconPath').setAttribute('fill', allCleared ? (progress.trialPassed ? 'var(--s4)' : 'var(--gold)') : '#5a5a52');
-  $('trialTitle').textContent = progress.trialPassed
-    ? 'Final Trial — Crown earned'
-    : (allCleared ? 'Final Trial — ready' : 'Final Trial — locked');
-  $('trialDesc').textContent = progress.trialPassed
-    ? `Best score ${Math.round(progress.trialBest*100)}%. Replay any time.`
-    : (allCleared ? `The hardest phrases from every verb, mixed together. Score ${Math.round(TRIAL_THRESHOLD*100)}%+ to earn the Crown.` : 'Clear every verb to unlock the Crown trial.');
-  tc.onclick = allCleared ? startTrial : null;
+  // PRACTICE sets: round-robin one item per verb, cycling through every family,
+  // so drilling never leans on just one verb — then chunked into 5 sets.
+  const byVerb = {};
+  verbs.forEach(v => { byVerb[v.id] = v.items.map(it => igMakeItem(v,it)); });
+  const interleaved = []; let row = 0;
+  const totalItems = verbs.reduce((s,v) => s+v.items.length, 0);
+  while (interleaved.length < totalItems) {
+    verbs.forEach(v => { const arr = byVerb[v.id]; if (arr[row]) interleaved.push(arr[row]); });
+    row++;
+  }
+  const N_PRACTICE = 5;
+  const chunk = Math.ceil(interleaved.length / N_PRACTICE);
+  for (let i=0;i<N_PRACTICE;i++){
+    const pool = interleaved.slice(i*chunk, i*chunk+chunk);
+    if (pool.length) igCats.push({ key: 'practice_'+i, kind: 'practice', label: 'PRACTICE '+(i+1), color: '#7dd3fc', colorRgb: '125,211,252', pool });
+  }
+
+  igCats.push({ key: 'trial', kind: 'trial', label: 'TRIAL', color: '#ff4d4d', colorRgb: '255,77,77', pool: [] });
+
+  igAllItems = [];
+  igCats.forEach(c => { if (c.kind==='verb' || c.kind==='mix') igAllItems.push(...c.pool); });
 }
 
-function starsFor(acc){
-  if (acc >= 0.9) return '★★★';
-  if (acc >= 0.7) return '★★☆';
-  if (acc >= CLEAR_THRESHOLD) return '★☆☆';
-  return '';
+function igCoreCategories(){ return igCats.filter(c => c.kind==='verb' || c.kind==='mix'); }
+function igClearedCount(){ return igCoreCategories().filter(c => igProgress.catResults[c.key]?.cleared).length; }
+function igStageThresholds(){
+  const N = igCoreCategories().length;
+  const s2 = Math.max(1, Math.ceil(N*0.2));
+  const s3 = Math.max(s2+1, Math.ceil(N*0.45));
+  const s4 = Math.max(s3+1, Math.ceil(N*0.75));
+  return [0,s2,s3,s4,N];
+}
+function igCurrentStageIndex(){
+  const T = igStageThresholds(); const c = igClearedCount();
+  if (c >= T[4] && igProgress.trialPassed) return 4;
+  if (c >= T[3]) return 3;
+  if (c >= T[2]) return 2;
+  if (c >= T[1]) return 1;
+  return 0;
+}
+function updateIgStageLabel(){
+  const el = document.getElementById('igStageLabel');
+  if (!el) return;
+  const idx = igCurrentStageIndex(); const T = igStageThresholds(); const cleared = igClearedCount();
+  let txt = IG_STAGES[idx].label.toUpperCase();
+  if (idx < 4) { const remain = Math.max(0, T[idx+1]-cleared); txt += ' · ' + remain + ' TO ' + IG_STAGES[idx+1].label.toUpperCase(); }
+  else txt += ' · MASTERED';
+  el.textContent = txt; el.style.color = IG_STAGES[idx].color;
+}
+function showIgStageFlash(stageIdx){
+  const s = IG_STAGES[stageIdx];
+  const el = document.getElementById('streakFlash');
+  el.textContent = '✦ ' + s.label.toUpperCase() + ' REACHED ✦';
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2600);
 }
 
-/* ======================================================================
-   PLAY — round state
-====================================================================== */
-let round = null; // holds everything for the current round
+function buildIgTabs(){
+  const wrap = document.getElementById('verbTabs');
+  wrap.innerHTML = '';
+  const coreCleared = igCoreCategories().every(c => igProgress.catResults[c.key]?.cleared);
+  igCats.forEach((c,i) => {
+    const locked = c.kind==='trial' && !coreCleared;
+    const btn = document.createElement('button');
+    btn.className = 'vtab' + (i===igCatIdx?' active':'') + (locked?' locked':'');
+    const res = igProgress.catResults[c.key] || (c.kind==='trial' && igProgress.trialPassed ? { bestAccuracy: 1 } : null);
+    if (res) {
+      const pct = res.bestAccuracy;
+      if (pct===1) btn.classList.add('score-perfect');
+      else if (pct>=.8) btn.classList.add('score-great');
+      else if (pct>=.5) btn.classList.add('score-ok');
+      else btn.classList.add('score-poor');
+    }
+    btn.textContent = c.label;
+    btn.style.setProperty('--verb-color', c.color);
+    btn.style.setProperty('--verb-rgb', c.colorRgb);
+    if (!locked) btn.addEventListener('click', e => { e.stopPropagation(); switchIgCat(i); });
+    wrap.appendChild(btn);
+  });
+  wrap.querySelectorAll('.vtab')[igCatIdx]?.scrollIntoView({ inline: 'center', block: 'nearest' });
+}
 
-function startVerb(verbId){
-  const family = VERB_FAMILIES.find(f => f.id === verbId);
-  const pool = FULL_POOL.filter(it => it.verb === verbId);
-  beginRound({ mode:'verb', index:verbId, pool, label: `${family.label} · match this meaning` });
+function switchIgCat(i){
+  const cat = igCats[i];
+  if (cat.kind === 'trial') {
+    const coreCleared = igCoreCategories().every(c => igProgress.catResults[c.key]?.cleared);
+    if (!coreCleared) return;
+  }
+  igCatIdx = i;
+  document.querySelectorAll('#verbTabs .vtab').forEach((b,j) => b.classList.toggle('active', j===i));
+  beginIgRound(cat);
+  updateModeBadges();
 }
-function startRevision(i){
-  beginRound({ mode:'revision', index:i, pool: REVISION_MIXES[i], label: `REVISION ${i+1} · match this meaning` });
-}
-function startTrial(){
-  // weight the trial pool toward historically-missed phrases
-  const weighted = FULL_POOL.map(it => {
-    const st = progress.phraseStats[it.p];
-    const missRatio = st && (st.hits+st.misses) > 0 ? st.misses / (st.hits+st.misses) : 0.5;
+
+function igBuildTrialPool(){
+  const weighted = igAllItems.map(it => {
+    const st = igProgress.phraseStats[it.p];
+    const missRatio = st && (st.hits+st.misses) > 0 ? st.misses/(st.hits+st.misses) : 0.5;
     return { it, w: 1 + missRatio*4 };
   });
   const bag = [];
-  weighted.forEach(({it,w}) => { for(let k=0;k<Math.round(w*2);k++) bag.push(it); });
-  const trialPool = shuffle([...new Set(shuffle(bag).slice(0, 60))]).slice(0, 24);
-  beginRound({ mode:'trial', index:null, pool: trialPool.length ? trialPool : shuffle(FULL_POOL).slice(0,24), label: 'FINAL TRIAL · match this meaning' });
+  weighted.forEach(({it,w}) => { for (let k=0;k<Math.round(w*2);k++) bag.push(it); });
+  const uniq = shuffled([...new Set(shuffled(bag).slice(0,60))]);
+  const picked = uniq.slice(0,24);
+  return picked.length ? picked : shuffled(igAllItems).slice(0,24);
 }
 
-function beginRound(cfg){
-  round = {
-    mode: cfg.mode, index: cfg.index, poolItems: cfg.pool, label: cfg.label,
-    active: [...cfg.pool], resting: [],       // resting: {item, left}
-    exposure: {}, weight: {}, restLeft: {},
-    coverage: new Set(),
-    target: null, targetSpawned:false, forceIn:0,
-    hits:0, misses:0, streak:0,
-    timeLeft: ROUND_SECONDS,
+function stopIgRound(){
+  if (!igRound) return;
+  clearInterval(igRound.spawnTimer); clearInterval(igRound.clockTimer); cancelAnimationFrame(igRound.rafId);
+  igRound.live.forEach(rec => rec.el.remove());
+  igRound = null;
+}
+
+function beginIgRound(cat){
+  stopIgRound();
+  const pool = cat.kind === 'trial' ? igBuildTrialPool() : cat.pool;
+  igRound = {
+    cat, poolItems: pool, active: [...pool], resting: [],
+    exposure: {}, weight: {}, coverage: new Set(),
+    target: null, targetSpawned: false, forceIn: 0, targetLifeBonus: 1,
+    hits: 0, misses: 0, streak: 0, timeLeft: IG_ROUND_SECONDS,
     live: new Set(), spawnTimer: null, clockTimer: null, rafId: null,
   };
-  cfg.pool.forEach(it => { round.exposure[it.p] = 0; round.weight[it.p] = 1; });
-
-  $('mixLabel').textContent = cfg.label;
-  $('hitVal').textContent = 0; $('missVal').textContent = 0; $('streakVal').textContent = 0;
-  $('streakLabel').classList.remove('hot');
-  $('clockVal').textContent = fmtClock(round.timeLeft);
-  $('clockVal').classList.remove('low');
-  $('field').innerHTML = '';
-  hideToast();
-
-  showScreen('play');
-  newTarget();
-  round.rafId = requestAnimationFrame(frame);
-  round.spawnTimer = setInterval(spawnWord, 1480);
-  spawnWord();
-  round.clockTimer = setInterval(tickClock, 1000);
+  pool.forEach(it => { igRound.exposure[it.p]=0; igRound.weight[it.p]=1; });
+  document.documentElement.style.setProperty('--verb-color', cat.color);
+  document.documentElement.style.setProperty('--verb-rgb', cat.colorRgb);
+  renderIgSlide();
+  scoreOk = 0; scoreErr = 0;
+  document.getElementById('scoreOk').textContent = 0;
+  document.getElementById('scoreErr').textContent = 0;
+  igNewTarget();
+  igRound.rafId = requestAnimationFrame(igFrame);
+  igRound.spawnTimer = setInterval(igSpawnWord, 1480);
+  igSpawnWord();
+  igRound.clockTimer = setInterval(igTickClock, 1000);
 }
 
-function fmtClock(s){ const m = Math.floor(s/60); const sec = s%60; return m + ':' + String(sec).padStart(2,'0'); }
-
-function tickClock(){
-  round.timeLeft--;
-  $('clockVal').textContent = fmtClock(round.timeLeft);
-  $('clockVal').classList.toggle('low', round.timeLeft <= 15);
-  if (round.timeLeft <= 0) endRound();
+function renderIgSlide(){
+  const container = document.getElementById('slidesContainer');
+  const cat = igRound.cat;
+  container.innerHTML = `
+    <div class="slide active incoming-slide">
+      <div class="incoming-stage-label" id="igStageLabel"></div>
+      <div class="incoming-hud">
+        <span class="incoming-streak" id="igStreakLabel">streak <b id="igStreakVal">0</b></span>
+        <span class="incoming-clock" id="igClockVal">2:00</span>
+      </div>
+      <div class="incoming-prompt">
+        <div class="incoming-prompt-label">${cat.label} · match this meaning</div>
+        <div class="incoming-prompt-text" id="igPromptText">…</div>
+      </div>
+      <div class="incoming-field" id="igField"></div>
+      <div class="incoming-toast" id="igToast"></div>
+    </div>`;
+  document.getElementById('sectionLabel').textContent = '';
+  document.getElementById('prevBtn').disabled = igCatIdx === 0;
+  document.getElementById('nextBtn').disabled = igCatIdx === igCats.length - 1;
+  updateIgStageLabel();
 }
 
-function weightedPick(){
-  const bag = [];
-  round.active.forEach(it => { for(let i=0;i<round.weight[it.p];i++) bag.push(it); });
-  return bag.length ? bag[(Math.random()*bag.length)|0] : (round.active[0] || round.poolItems[0]);
-}
-
-function newTarget(){
-  if (!round.active.length) refillFromResting(true);
-  round.target = weightedPick();
-  $('promptText').textContent = round.target.m;
-  round.targetSpawned = false;
-
-  // Some definitions pack two or three senses into one line ("to change one's
-  // opinion or recover consciousness"). That's more to hold in mind before the
-  // player can even start scanning the field, so it earns extra time: more
-  // decoys pass before the target itself appears, and a slower growth once it does.
-  const complexity = defComplexity(round.target.m);
-  round.forceIn = randInt(3,5) + complexity;
-  round.targetLifeBonus = 1 + complexity * 0.22;
-}
-
-function defComplexity(meaning){
-  const semis = (meaning.match(/;/g) || []).length;
-  const ors = (meaning.match(/\bor\b/g) || []).length;
+function igDefComplexity(meaning){
+  const semis = (meaning.match(/;/g)||[]).length;
+  const ors = (meaning.match(/\bor\b/g)||[]).length;
   return semis + ors;
 }
-
-function refillFromResting(force){
-  if (!round.resting.length) return;
+function igWeightedPick(){
+  const bag = [];
+  igRound.active.forEach(it => { for (let i=0;i<igRound.weight[it.p];i++) bag.push(it); });
+  return bag.length ? bag[(Math.random()*bag.length)|0] : (igRound.active[0] || igRound.poolItems[0]);
+}
+function igRefillFromResting(force){
+  if (!igRound.resting.length) return;
   if (force) {
-    // bring back the longest-resting item immediately so the round can continue
-    round.resting.sort((a,b) => a.left - b.left);
-    const rec = round.resting.shift();
-    round.exposure[rec.item.p] = 0;
-    round.weight[rec.item.p] = 1;
-    round.active.push(rec.item);
+    igRound.resting.sort((a,b) => a.left-b.left);
+    const rec = igRound.resting.shift();
+    igRound.exposure[rec.item.p]=0; igRound.weight[rec.item.p]=1;
+    igRound.active.push(rec.item);
   }
 }
-
-function tickRestCounters(){
-  for (let i = round.resting.length - 1; i >= 0; i--) {
-    round.resting[i].left--;
-    if (round.resting[i].left <= 0) {
-      const rec = round.resting.splice(i,1)[0];
-      round.exposure[rec.item.p] = 0;
-      round.weight[rec.item.p] = 1;
-      round.active.push(rec.item);
+function igTickRestCounters(){
+  for (let i=igRound.resting.length-1;i>=0;i--){
+    igRound.resting[i].left--;
+    if (igRound.resting[i].left<=0){
+      const rec = igRound.resting.splice(i,1)[0];
+      igRound.exposure[rec.item.p]=0; igRound.weight[rec.item.p]=1;
+      igRound.active.push(rec.item);
     }
   }
 }
-
-/* ---------- spawning / field physics (unchanged core feel) ---------- */
-const STYLES = [
-  { family:"'Space Grotesk',sans-serif", weight:700, style:'normal', case:'upper', tracking:'.01em', sizeMul:1.00 },
-  { family:"'Fraunces',serif",           weight:600, style:'italic', case:'title', tracking:'0em',   sizeMul:1.05 },
-  { family:"'Archivo Black',sans-serif", weight:400, style:'normal', case:'upper', tracking:'-.01em', sizeMul:0.92 },
-  { family:"'Bungee',cursive",           weight:400, style:'normal', case:'upper', tracking:'0em',   sizeMul:0.85 },
-  { family:"'Caveat',cursive",           weight:700, style:'normal', case:'title', tracking:'.01em', sizeMul:1.35 },
-];
-function styledText(phrase, cased){
-  if (cased === 'title') return phrase.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
-  return phrase;
+function igNewTarget(){
+  if (!igRound.active.length) igRefillFromResting(true);
+  igRound.target = igWeightedPick();
+  const el = document.getElementById('igPromptText');
+  if (el) el.textContent = igRound.target.m;
+  igRound.targetSpawned = false;
+  const complexity = igDefComplexity(igRound.target.m);
+  igRound.forceIn = igRandInt(3,5) + complexity;
+  igRound.targetLifeBonus = 1 + complexity*0.22;
 }
 
-function decoyItem(){
-  // occasionally pull a same-verb confusion for realism; otherwise any pool word
+function igDecoyItem(){
   if (Math.random() < 0.35) {
-    const family = FULL_POOL.filter(it => it.verb === round.target.verb && it.p !== round.target.p);
-    if (family.length) return pick(family);
+    const fam = igAllItems.filter(it => it.verb === igRound.target.verb && it.p !== igRound.target.p);
+    if (fam.length) return igPick(fam);
   }
-  const universe = round.active.concat(round.resting.map(r => r.item));
-  return universe.length ? pick(universe) : round.target;
+  const universe = igRound.active.concat(igRound.resting.map(r => r.item));
+  return universe.length ? igPick(universe) : igRound.target;
 }
 
-function findSpawnSpot(field, fw, fh){
+function igFindSpawnSpot(field, fw, fh){
   let best = null, bestScore = -1;
   for (let i=0;i<10;i++){
-    const cx = rand(fw*.18, fw*.82), cy = rand(fh*.15, fh*.8);
+    const cx = igRand(fw*.14, fw*.86), cy = igRand(fh*.12, fh*.84);
     let minDist = Infinity;
-    round.live.forEach(rec => { const d = Math.hypot(cx-rec.x, cy-rec.y) - (rec.radius||20); if (d<minDist) minDist=d; });
+    igRound.live.forEach(rec => { const d = Math.hypot(cx-rec.x, cy-rec.y) - (rec.radius||20); if (d<minDist) minDist=d; });
     if (minDist > bestScore){ bestScore = minDist; best = {x:cx,y:cy}; }
   }
   return best;
 }
 
-function spawnWord(){
-  if (!round) return;
-  tickRestCounters();
-
+function igSpawnWord(){
+  if (!igRound) return;
+  igTickRestCounters();
   let item;
-  if (!round.targetSpawned) {
-    round.forceIn--;
-    item = round.forceIn <= 0 ? round.target : decoyItem();
+  if (!igRound.targetSpawned) {
+    igRound.forceIn--;
+    item = igRound.forceIn <= 0 ? igRound.target : igDecoyItem();
   } else {
-    item = decoyItem();
+    item = igDecoyItem();
   }
-  if (item.p === round.target.p) round.targetSpawned = true;
+  if (item.p === igRound.target.p) igRound.targetSpawned = true;
 
-  const field = $('field');
+  const field = document.getElementById('igField');
+  if (!field) return;
   const el = document.createElement('div');
-  el.className = 'word';
-  const variant = pick(STYLES);
-  el.textContent = styledText(item.p, variant.case);
-  el.style.fontFamily = variant.family; el.style.fontWeight = variant.weight; el.style.fontStyle = variant.style;
-  el.style.letterSpacing = variant.tracking; el.style.color = item.color;
+  el.className = 'incoming-word';
+  el.textContent = item.p;
+  el.style.color = item.color;
 
   const fw = field.clientWidth, fh = field.clientHeight;
-  const {x,y} = findSpawnSpot(field, fw, fh);
-  const pace = Math.max(0.78, 1 - round.streak * 0.02);
-  const isTarget = item.p === round.target.p;
-  const lifeBonus = isTarget ? (round.targetLifeBonus || 1) : 1;
-  const life = rand(6200, 9200) * pace * lifeBonus;
+  const spot = igFindSpawnSpot(field, fw, fh);
+  const pace = Math.max(0.78, 1 - igRound.streak*0.02);
+  const isTarget = item.p === igRound.target.p;
+  const lifeBonus = isTarget ? (igRound.targetLifeBonus||1) : 1;
+  const life = igRand(6200,9200) * pace * lifeBonus;
   const born = performance.now();
 
   field.appendChild(el);
-  const rec = { el, x, y, born, life, phrase:item.p, item, dead:false, sizeMul:variant.sizeMul };
-  round.live.add(rec);
-  el.addEventListener('click', () => hit(rec));
+  const rec = { el, x: spot.x, y: spot.y, born, life, phrase: item.p, item, dead: false };
+  igRound.live.add(rec);
+  el.addEventListener('click', () => igHit(rec));
 }
 
-function frame(now){
-  if (!round) return;
-  round.live.forEach(rec => {
+function igFrame(now){
+  if (!igRound) return;
+  igRound.live.forEach(rec => {
     if (rec.dead) return;
     const t = (now - rec.born) / rec.life;
-    if (t >= 1) { miss(rec); return; }
-    const scale = 0.15 + t*t*2.1;
+    if (t >= 1) { igMiss(rec); return; }
+    const scale = 0.18 + t*t*1.9;
     rec.scale = scale;
-    rec.radius = rec.phrase.length * 6.5 * scale * rec.sizeMul + 14;
+    rec.radius = rec.phrase.length*6.2*scale + 14;
     rec.opacity = Math.min(1, t*2.4);
-    rec.blur = Math.max(0, 2.4 - t*10);
+    rec.blur = Math.max(0, 2.2 - t*9);
   });
-  const arr = [...round.live].filter(r => !r.dead);
+  const arr = [...igRound.live].filter(r => !r.dead);
   for (let i=0;i<arr.length;i++){
     for (let j=i+1;j<arr.length;j++){
       const a=arr[i], b=arr[j];
@@ -668,218 +2169,176 @@ function frame(now){
       const minDist=(a.radius+b.radius)*0.85;
       if (dist<minDist){
         const overlap=minDist-dist, nx=dx/dist, ny=dy/dist, aShare=b.scale/(a.scale+b.scale);
-        a.x-=nx*overlap*aShare*0.5; a.y-=ny*overlap*aShare*0.5;
-        b.x+=nx*overlap*(1-aShare)*0.5; b.y+=ny*overlap*(1-aShare)*0.5;
+        a.x -= nx*overlap*aShare*0.5; a.y -= ny*overlap*aShare*0.5;
+        b.x += nx*overlap*(1-aShare)*0.5; b.y += ny*overlap*(1-aShare)*0.5;
       }
     }
   }
-  const field = $('field'); const fw=field.clientWidth, fh=field.clientHeight;
-  arr.forEach(rec => {
-    rec.x = Math.min(fw-rec.radius*0.3, Math.max(rec.radius*0.3, rec.x));
-    rec.y = Math.min(fh-rec.radius*0.3, Math.max(rec.radius*0.3, rec.y));
-    rec.el.style.transform = `translate(${rec.x}px, ${rec.y}px) translate(-50%,-50%)`;
-    rec.el.style.opacity = rec.opacity;
-    rec.el.style.filter = `blur(${rec.blur}px)`;
-    rec.el.style.fontSize = (22 * rec.sizeMul * rec.scale) + 'px';
-    rec.el.style.zIndex = Math.floor(rec.scale*100);
-  });
-  round.rafId = requestAnimationFrame(frame);
+  const field = document.getElementById('igField');
+  if (field) {
+    const fw = field.clientWidth, fh = field.clientHeight;
+    arr.forEach(rec => {
+      rec.x = Math.min(fw-rec.radius*0.3, Math.max(rec.radius*0.3, rec.x));
+      rec.y = Math.min(fh-rec.radius*0.3, Math.max(rec.radius*0.3, rec.y));
+      rec.el.style.transform = `translate(${rec.x}px, ${rec.y}px) translate(-50%,-50%)`;
+      rec.el.style.opacity = rec.opacity;
+      rec.el.style.filter = `blur(${rec.blur}px)`;
+      rec.el.style.fontSize = (20*rec.scale) + 'px';
+      rec.el.style.zIndex = Math.floor(rec.scale*100);
+    });
+  }
+  igRound.rafId = requestAnimationFrame(igFrame);
 }
 
-function removeRec(rec){ rec.dead = true; round.live.delete(rec); rec.el.remove(); }
+function igRemoveRec(rec){ rec.dead = true; igRound.live.delete(rec); rec.el.remove(); }
 
-function miss(rec){
-  if (rec.dead || !round) return;
-  removeRec(rec);
-  // A decoy timing out unclicked is normal traffic, not a failure — it was
-  // never a word the player was supposed to catch. Only the target expiring
-  // uncaught counts as a scored miss.
-  if (rec.phrase !== round.target.p) return;
-
-  round.misses++; round.streak = 0;
-  $('missVal').textContent = round.misses;
-  updateStreak();
-  round.targetSpawned = false; round.forceIn = randInt(2,3);
-  round.weight[round.target.p] = Math.min(5, (round.weight[round.target.p]||1) + 2);
-  const st = pstat(round.target.p); st.misses++;
-}
-
-function hit(rec){
-  if (rec.dead || !round) return;
-  if (rec.phrase === round.target.p) {
-    burst(rec); removeRec(rec);
-    round.hits++; round.streak++;
-    $('hitVal').textContent = round.hits;
-    updateStreak(); hideToast(); showContext(round.target);
-
-    round.coverage.add(round.target.p);
-    const st = pstat(round.target.p); st.hits++;
-    saveProgress();
-
-    round.exposure[round.target.p] = (round.exposure[round.target.p]||0) + 1;
-    round.weight[round.target.p] = Math.max(1, (round.weight[round.target.p]||1) - 1);
-
-    if (round.exposure[round.target.p] >= EXPOSURE_CAP) {
-      round.active = round.active.filter(it => it.p !== round.target.p);
-      round.resting.push({ item: round.target, left: REST_SPAWNS });
-    }
-    newTarget();
-  } else {
-    rec.el.classList.add('wrong');
-    rec.el.animate(
-      [{transform: rec.el.style.transform}, {transform: rec.el.style.transform + ' translateX(-6px)'},
-       {transform: rec.el.style.transform + ' translateX(6px)'}, {transform: rec.el.style.transform}],
-      {duration:220}
-    );
-    setTimeout(()=> rec.el.classList.remove('wrong'), 220);
-    round.misses++; round.streak = 0;
-    $('missVal').textContent = round.misses;
-    updateStreak();
-    round.weight[round.target.p] = Math.min(5, (round.weight[round.target.p]||1) + 2);
-    const stTarget = pstat(round.target.p); stTarget.misses++;
-    if (round.weight[rec.phrase] !== undefined) round.weight[rec.phrase] = Math.min(5, round.weight[rec.phrase] + 1);
-    saveProgress();
-    showToast(`<b>${rec.phrase}</b><span> that's not it — keep watching.</span>`);
+function igUpdateStreak(){
+  const v = document.getElementById('igStreakVal');
+  const lbl = document.getElementById('igStreakLabel');
+  if (v) v.textContent = igRound.streak;
+  if (lbl) lbl.classList.toggle('hot', igRound.streak >= 5);
+  if (igRound.streak > 0 && igRound.streak % 3 === 0) {
+    const el = document.getElementById('streakFlash');
+    const msgs = ['🔥 ' + igRound.streak + ' in a row!', '⚡ ' + igRound.streak + ' streak!', '✨ ' + igRound.streak + ' correct!'];
+    el.textContent = msgs[Math.floor(Math.random()*msgs.length)];
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2000);
   }
 }
 
-function updateStreak(){
-  $('streakVal').textContent = round.streak;
-  $('streakLabel').classList.toggle('hot', round.streak >= 5);
+let igToastTimer;
+function igShowToast(html){
+  const t = document.getElementById('igToast'); if (!t) return;
+  t.innerHTML = html; t.classList.add('show');
+  clearTimeout(igToastTimer); igToastTimer = setTimeout(igHideToast, 1800);
 }
-
-let toastTimer;
-function showToast(html){
-  const t = $('toast'); t.innerHTML = html; t.classList.add('show'); t.classList.remove('good','rest');
-  clearTimeout(toastTimer); toastTimer = setTimeout(hideToast, 1800);
-}
-function showContext(item){
-  const t = $('toast');
+function igShowContext(item){
+  const t = document.getElementById('igToast'); if (!t) return;
   const sentence = item.s.replace(new RegExp(item.p,'i'), `<b>${item.p}</b>`);
   t.innerHTML = `<span>${sentence}</span>`;
-  t.classList.add('show','good'); t.classList.remove('rest');
-  clearTimeout(toastTimer); toastTimer = setTimeout(hideToast, 1600);
+  t.classList.add('show');
+  clearTimeout(igToastTimer); igToastTimer = setTimeout(igHideToast, 1600);
 }
-function hideToast(){ $('toast').classList.remove('show'); }
+function igHideToast(){ const t = document.getElementById('igToast'); if (t) t.classList.remove('show'); }
 
-function burst(rec){
-  const field = $('field');
+function igBurst(rec){
+  const field = document.getElementById('igField'); if (!field) return;
+  const cols = ['#C9A961','#FFD94A','#4DC98A','#e5e5e7'];
   const rect = rec.el.getBoundingClientRect(); const fr = field.getBoundingClientRect();
   const cx = rect.left-fr.left+rect.width/2, cy = rect.top-fr.top+rect.height/2;
-  rec.el.animate([{transform: rec.el.style.transform, opacity:1, filter:'blur(0px)'},
-    {transform: rec.el.style.transform + ' scale(1.6)', opacity:0, filter:'blur(2px)'}], {duration:260, easing:'ease-out'});
-  const cols = ['#C9A961','#FFD94A','#5ED39B','#e8e6e1'];
-  for (let i=0;i<10;i++){
-    const s = document.createElement('div'); s.className='spark';
-    s.style.left=cx+'px'; s.style.top=cy+'px'; s.style.background=pick(cols);
-    s.style.transition='transform .5s ease-out, opacity .5s ease-out';
+  for (let i=0;i<8;i++){
+    const s = document.createElement('div');
+    s.style.cssText = `position:absolute;width:5px;height:5px;border-radius:50%;left:${cx}px;top:${cy}px;background:${igPick(cols)};pointer-events:none;transition:transform .5s ease-out, opacity .5s ease-out;z-index:9`;
     field.appendChild(s);
-    const a = Math.random()*Math.PI*2, d = 30+Math.random()*46;
-    requestAnimationFrame(()=>{ s.style.transform = `translate(${Math.cos(a)*d}px,${Math.sin(a)*d}px)`; s.style.opacity='0'; });
-    setTimeout(()=>s.remove(), 520);
+    const a = Math.random()*Math.PI*2, d = 26+Math.random()*40;
+    requestAnimationFrame(() => { s.style.transform = `translate(${Math.cos(a)*d}px,${Math.sin(a)*d}px)`; s.style.opacity='0'; });
+    setTimeout(() => s.remove(), 520);
   }
 }
 
-/* ======================================================================
-   ROUND END → SUMMARY
-====================================================================== */
-function endRound(){
-  clearInterval(round.spawnTimer); clearInterval(round.clockTimer); cancelAnimationFrame(round.rafId);
-  round.live.forEach(rec => rec.el.remove());
+function igMiss(rec){
+  if (rec.dead || !igRound) return;
+  igRemoveRec(rec);
+  if (rec.phrase !== igRound.target.p) return;
+  igRound.misses++; igRound.streak = 0;
+  scoreErr = igRound.misses;
+  document.getElementById('scoreErr').textContent = scoreErr;
+  igUpdateStreak();
+  igRound.targetSpawned = false; igRound.forceIn = igRandInt(2,3);
+  igRound.weight[igRound.target.p] = Math.min(5, (igRound.weight[igRound.target.p]||1) + 2);
+  igPstat(igRound.target.p).misses++;
+}
 
-  const attempts = round.hits + round.misses;
-  const accuracy = attempts ? round.hits/attempts : 0;
-  const coveragePct = round.poolItems.length ? round.coverage.size/round.poolItems.length : 0;
-  const stageBefore = currentStageIndex();
+function igHit(rec){
+  if (rec.dead || !igRound) return;
+  if (rec.phrase === igRound.target.p) {
+    igBurst(rec); igRemoveRec(rec);
+    igRound.hits++; igRound.streak++;
+    scoreOk = igRound.hits;
+    document.getElementById('scoreOk').textContent = scoreOk;
+    igUpdateStreak(); igHideToast(); igShowContext(igRound.target);
+    igRound.coverage.add(igRound.target.p);
+    igPstat(igRound.target.p).hits++;
+    igStoreWrite(igProgress);
+    igRound.exposure[igRound.target.p] = (igRound.exposure[igRound.target.p]||0) + 1;
+    igRound.weight[igRound.target.p] = Math.max(1, (igRound.weight[igRound.target.p]||1) - 1);
+    if (igRound.exposure[igRound.target.p] >= IG_EXPOSURE_CAP) {
+      igRound.active = igRound.active.filter(it => it.p !== igRound.target.p);
+      igRound.resting.push({ item: igRound.target, left: IG_REST_SPAWNS });
+    }
+    igNewTarget();
+  } else {
+    rec.el.classList.add('wrong');
+    setTimeout(() => rec.el.classList.remove('wrong'), 260);
+    igRound.misses++; igRound.streak = 0;
+    scoreErr = igRound.misses;
+    document.getElementById('scoreErr').textContent = scoreErr;
+    igUpdateStreak();
+    igRound.weight[igRound.target.p] = Math.min(5, (igRound.weight[igRound.target.p]||1) + 2);
+    igPstat(igRound.target.p).misses++;
+    if (igRound.weight[rec.phrase] !== undefined) igRound.weight[rec.phrase] = Math.min(5, igRound.weight[rec.phrase] + 1);
+    igStoreWrite(igProgress);
+    igShowToast(`<b>${rec.phrase}</b><span> not quite — keep watching.</span>`);
+  }
+}
 
+function igTickClock(){
+  igRound.timeLeft--;
+  const el = document.getElementById('igClockVal');
+  if (el) { el.textContent = igFmtClock(igRound.timeLeft); el.classList.toggle('low', igRound.timeLeft<=15); }
+  if (igRound.timeLeft <= 0) endIgRound();
+}
+function igFmtClock(s){ const m = Math.floor(s/60); const sec = s%60; return m + ':' + String(sec).padStart(2,'0'); }
+
+function endIgRound(){
+  clearInterval(igRound.spawnTimer); clearInterval(igRound.clockTimer); cancelAnimationFrame(igRound.rafId);
+  igRound.live.forEach(rec => rec.el.remove());
+  const attempts = igRound.hits + igRound.misses;
+  const accuracy = attempts ? igRound.hits/attempts : 0;
+  const coveragePct = igRound.poolItems.length ? igRound.coverage.size/igRound.poolItems.length : 0;
+  const cat = igRound.cat;
+  const stageBefore = igCurrentStageIndex();
   let cleared = false;
-  if (round.mode === 'verb') {
-    cleared = accuracy >= CLEAR_THRESHOLD;
-    const prev = progress.verbResults[round.index];
-    progress.verbResults[round.index] = { cleared: cleared || (prev && prev.cleared), bestAccuracy: Math.max(accuracy, prev ? prev.bestAccuracy : 0), coverage: coveragePct };
-    saveProgress();
-  } else if (round.mode === 'revision') {
-    // Revision rounds still feed the global phraseStats (so badges and the
-    // trial's difficulty-weighting see this practice), but they don't count
-    // toward the stage ladder — Crown stays tied to the structured curriculum.
-    cleared = accuracy >= CLEAR_THRESHOLD;
-    const prev = progress.revResults[round.index];
-    progress.revResults[round.index] = { cleared: cleared || (prev && prev.cleared), bestAccuracy: Math.max(accuracy, prev ? prev.bestAccuracy : 0), coverage: coveragePct };
-    saveProgress();
-  } else if (round.mode === 'trial') {
-    cleared = accuracy >= TRIAL_THRESHOLD;
-    progress.trialBest = Math.max(accuracy, progress.trialBest || 0);
-    if (cleared) progress.trialPassed = true;
-    saveProgress();
-  }
-
-  renderSummary({ accuracy, cleared, coveragePct });
-
-  const stageAfter = currentStageIndex();
-  if (stageAfter > stageBefore) {
-    setTimeout(() => showStageUp(stageAfter), 550);
-  }
-}
-
-function renderSummary(res){
-  showScreen('summary');
-  $('sumEyebrow').textContent = round.mode === 'trial' ? 'FINAL TRIAL' : (round.mode === 'revision' ? `REVISION ${round.index+1}` : VERB_FAMILIES.find(f => f.id === round.index).label);
-  const v = $('sumVerdict');
-  if (round.mode === 'trial') {
-    v.textContent = res.cleared ? 'Crown earned' : 'Not yet';
-    v.className = 'sumverdict ' + (res.cleared ? 'cleared' : 'short');
+  if (cat.kind === 'trial') {
+    cleared = accuracy >= IG_TRIAL_THRESHOLD;
+    igProgress.trialBest = Math.max(accuracy, igProgress.trialBest || 0);
+    if (cleared) igProgress.trialPassed = true;
   } else {
-    v.textContent = res.cleared ? 'Cleared' : 'Keep training';
-    v.className = 'sumverdict ' + (res.cleared ? 'cleared' : 'short');
+    cleared = accuracy >= IG_CLEAR_THRESHOLD;
+    const prev = igProgress.catResults[cat.key];
+    igProgress.catResults[cat.key] = { cleared: cleared || (prev && prev.cleared), bestAccuracy: Math.max(accuracy, prev ? prev.bestAccuracy : 0), coverage: coveragePct };
   }
-  $('sumStars').textContent = (round.mode === 'verb' || round.mode === 'revision') ? starsFor(res.accuracy) : '';
-  $('sumHits').textContent = round.hits;
-  $('sumMiss').textContent = round.misses;
-  $('sumAcc').textContent = Math.round(res.accuracy*100) + '%';
-
-  const note = $('sumNote');
-  if (round.mode === 'verb') {
-    note.textContent = res.cleared
-      ? `Coverage: you met ${Math.round(res.coveragePct*100)}% of this verb's phrases at least once.`
-      : `Needs ${Math.round(CLEAR_THRESHOLD*100)}% accuracy to clear. You reached ${Math.round(res.accuracy*100)}%.`;
-  } else if (round.mode === 'revision') {
-    note.textContent = res.cleared
-      ? `Coverage: you met ${Math.round(res.coveragePct*100)}% of this set's phrases at least once, drawn from every verb family.`
-      : `Needs ${Math.round(CLEAR_THRESHOLD*100)}% accuracy to clear. You reached ${Math.round(res.accuracy*100)}%.`;
-  } else {
-    note.textContent = res.cleared
-      ? 'Every family in the set, held under time pressure. That\u2019s the whole job.'
-      : `Needs ${Math.round(TRIAL_THRESHOLD*100)}% accuracy. You reached ${Math.round(res.accuracy*100)}% — try again any time.`;
-  }
-
-  $('sumRetry').onclick = () => {
-    if (round.mode === 'trial') startTrial();
-    else if (round.mode === 'revision') startRevision(round.index);
-    else startVerb(round.index);
-  };
-  $('sumNext').onclick = () => { renderMenu(); };
+  igStoreWrite(igProgress);
+  buildIgTabs();
+  updateIgStageLabel();
+  showIgResults(igRound.hits, igRound.misses, accuracy, cleared, coveragePct, cat);
+  const stageAfter = igCurrentStageIndex();
+  if (stageAfter > stageBefore) setTimeout(() => showIgStageFlash(stageAfter), 700);
+  updateModeBadges();
 }
 
-function showStageUp(stageIdx){
-  const s = STAGES[stageIdx];
-  const el = $('stageup');
-  el.style.setProperty('--glowcol', s.glow);
-  $('stageupIcon').innerHTML = svgIcon(stageIdx, s.color);
-  $('stageupName').textContent = s.label;
-  $('stageupDesc').textContent = s.desc;
-  el.classList.add('show');
-  el.onclick = () => { el.classList.remove('show'); renderMenu(); };
+function showIgResults(hits, misses, accuracy, cleared, coveragePct, cat){
+  const pct = Math.round(accuracy*100);
+  const perfect = pct === 100;
+  document.getElementById('ovTitle').textContent = cat.kind === 'trial' ? (cleared ? 'Crown Earned' : 'Not Yet') : (cleared ? 'Cleared' : 'Keep Training');
+  document.getElementById('ovScore').textContent = hits + ' hit · ' + misses + ' missed · ' + pct + '%';
+  document.getElementById('ovPerfect').classList.toggle('show', perfect);
+  const stars = pct>=90?3:pct>=70?2:pct>=50?1:0;
+  document.getElementById('ovStars').innerHTML = Array.from({length:3},(_,i) => `<span class="ov-star">${i<stars?'★':'☆'}</span>`).join('');
+  document.getElementById('ovBars').style.display = 'none';
+  document.getElementById('ovBars').innerHTML = '';
+  document.getElementById('ovMsg').textContent = cat.kind === 'trial'
+    ? (cleared ? "Every family in the set, held under time pressure. That's the whole job." : `Needs ${Math.round(IG_TRIAL_THRESHOLD*100)}% accuracy. You reached ${pct}% — try again.`)
+    : (cleared ? `Coverage: you met ${Math.round(coveragePct*100)}% of this set's phrases at least once.` : `Needs ${Math.round(IG_CLEAR_THRESHOLD*100)}% accuracy to clear. You reached ${pct}%.`);
+  document.getElementById('ovAnswers').style.display = 'none';
+  document.getElementById('ovAnswers').innerHTML = '';
+  document.getElementById('overlay').classList.add('show');
+  if (perfect) { triggerConfetti(); setTimeout(() => showAwardPopup(), 300); }
 }
 
-/* ---------- back button ---------- */
-$('backBtn').addEventListener('click', () => {
-  if (round) { clearInterval(round.spawnTimer); clearInterval(round.clockTimer); cancelAnimationFrame(round.rafId); round.live.forEach(r=>r.el.remove()); }
-  renderMenu();
-});
-
-/* ---------- boot ---------- */
-$('subline').textContent = `${DATA.level} phrasal verbs · ${N_VERBS} verbs · ${FULL_POOL.length} phrases · 5 stages to Crown`;
-renderMenu();
+loadAll();
 </script>
 </body>
 </html>
+
+You are out of free messages until 5:20 AM
