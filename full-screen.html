@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Battle mode</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0b0b0c;
+    --panel:#141416;
+    --paper:#e8e6e1;
+    --paper-dim:rgba(232,230,225,.52);
+    --paper-faint:rgba(232,230,225,.28);
+    --gold:#C9A961;
+    --signal:#FFD94A;
+    --clear:#5ED39B;
+    --wrong:#E86A5C;
+    --line:rgba(232,230,225,.10);
+
+    --display:'Space Grotesk',system-ui,sans-serif;
+    --body:'DM Sans',system-ui,sans-serif;
+    --mono:'DM Mono',ui-monospace,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    font-family:var(--body); background:var(--ink); color:var(--paper);
+    display:flex; flex-direction:column; padding:clamp(.6rem,2vw,1.1rem); overflow:hidden;
+  }
+  button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+  :focus-visible{outline:2px solid var(--signal); outline-offset:3px; border-radius:4px}
+
+  /* ---------- masthead ---------- */
+  header{text-align:center; margin-bottom:.7rem}
+  h1{
+    font-family:var(--display); font-weight:700; font-size:clamp(.8rem,2.4vw,.92rem);
+    letter-spacing:.34em; text-transform:uppercase; color:var(--gold); text-indent:.34em;
+  }
+  .sub{font-size:.68rem; color:var(--paper-faint); margin-top:.3rem; letter-spacing:.02em}
+
+  /* ---------- frame ---------- */
+  #frame{
+    flex:1; width:100%; max-width:min(96vw,1180px); margin:0 auto; min-height:0;
+    display:flex; flex-direction:column; position:relative; overflow:hidden;
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    box-shadow:0 30px 80px rgba(0,0,0,.7);
+  }
+  #frame::before{content:''; position:absolute; inset:0 0 auto; height:2px; background:var(--gold); opacity:.55; z-index:6}
+
+  /* ---------- setup ---------- */
+  .setup{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1.4rem; padding:1.5rem}
+  .group{display:flex; flex-direction:column; align-items:center; gap:.55rem}
+  .grouplabel{font-family:var(--mono); font-size:.6rem; letter-spacing:.22em; text-transform:uppercase; color:var(--paper-faint)}
+  .pills{display:flex; gap:.35rem; flex-wrap:wrap; justify-content:center}
+  .pill{
+    font-family:var(--mono); font-size:.7rem; letter-spacing:.06em;
+    padding:.44rem 1rem; border-radius:2px; border:1px solid var(--line);
+    color:var(--paper-dim); transition:all .15s;
+  }
+  .pill:hover{border-color:rgba(232,230,225,.3); color:var(--paper)}
+  .pill[aria-pressed="true"]{background:var(--signal); border-color:var(--signal); color:var(--ink)}
+  .modehint{font-size:.66rem; color:var(--paper-faint); max-width:34ch; text-align:center; line-height:1.5; min-height:2em}
+
+  .cta{
+    font-family:var(--display); font-weight:700; font-size:.74rem; letter-spacing:.16em; text-transform:uppercase;
+    padding:.72rem 2.1rem; border-radius:2px; background:var(--signal); color:var(--ink); transition:transform .12s;
+  }
+  .cta:hover{transform:translateY(-1px)}
+  .cta.ghost{background:none; border:1px solid var(--line); color:var(--paper-dim)}
+  .cta.ghost:hover{border-color:var(--gold); color:var(--gold)}
+  .best{font-family:var(--mono); font-size:.64rem; color:var(--paper-faint)}
+  .best b{color:var(--gold); font-weight:500}
+
+  /* ---------- hud ---------- */
+  .hud{
+    display:flex; align-items:baseline; gap:1.1rem; padding:.7rem 1rem .55rem;
+    font-family:var(--mono); font-size:.68rem; letter-spacing:.04em;
+  }
+  .hud .spacer{flex:1}
+  .hud .val{font-variant-numeric:tabular-nums}
+  .left{color:var(--paper)} .miss{color:var(--wrong)} .streak{color:var(--gold)} .time{color:var(--paper-dim)}
+  .streak.hot{color:var(--signal)}
+  .track{height:2px; background:rgba(232,230,225,.08); margin:0 1rem}
+  .fill{height:100%; background:var(--clear); width:0; transition:width .35s ease}
+
+  /* ---------- prompt ---------- */
+  .prompt{
+    margin:.9rem 1rem .2rem; padding:.85rem 1rem; text-align:center;
+    border-left:2px solid var(--signal); background:rgba(255,217,74,.05);
+  }
+  .promptlabel{font-family:var(--mono); font-size:.56rem; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,217,74,.65); margin-bottom:.35rem}
+  .prompttext{font-size:clamp(.85rem,2.4vw,1.05rem); line-height:1.45}
+  .prompttext .gap{color:var(--signal); letter-spacing:.1em}
+
+  /* ---------- field ---------- */
+  .field{position:relative; flex:1; min-height:0; margin:.7rem .8rem 1rem; display:grid; gap:2px}
+  .word{
+    font-family:var(--display); font-weight:700; letter-spacing:.01em; text-transform:uppercase;
+    white-space:nowrap; place-self:center; padding:.15rem .3rem; line-height:1;
+    opacity:0; animation:fadeIn .35s ease forwards; transition:color .15s, opacity .15s;
+  }
+  .word:hover{color:var(--signal)}
+  .word.wrong{color:var(--wrong)!important; animation:shake .28s ease}
+  .word.gone{animation:dissolve .3s ease forwards; pointer-events:none}
+  @keyframes fadeIn{to{opacity:1}}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+  @keyframes dissolve{to{opacity:0; transform:scale(1.35); filter:blur(3px)}}
+  .spark{position:absolute; width:4px; height:4px; border-radius:50%; pointer-events:none}
+
+  /* ---------- correction toast ---------- */
+  .toast{
+    position:absolute; left:50%; bottom:1.2rem; transform:translate(-50%,12px);
+    background:var(--ink); border:1px solid rgba(232,230,225,.16); border-left:2px solid var(--wrong);
+    padding:.6rem .9rem; font-size:.74rem; max-width:min(92%,460px); text-align:left;
+    opacity:0; transition:opacity .2s, transform .2s; pointer-events:none; z-index:8;
+  }
+  .toast.show{opacity:1; transform:translate(-50%,0)}
+  .toast b{font-family:var(--display); color:var(--wrong); letter-spacing:.04em}
+  .toast span{color:var(--paper-dim)}
+
+  /* ---------- end ---------- */
+  .end{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.5rem; padding:1.4rem; overflow-y:auto}
+  .end .big{font-family:var(--display); font-weight:700; font-size:clamp(2rem,7vw,2.8rem); color:var(--clear); font-variant-numeric:tabular-nums}
+  .end .stat{font-family:var(--mono); font-size:.7rem; color:var(--paper-dim); letter-spacing:.04em}
+  .pb{font-family:var(--mono); font-size:.66rem; margin-top:.15rem}
+  .pb.new{color:var(--signal)} .pb.old{color:var(--paper-faint)}
+  .review{width:min(100%,460px); margin:.8rem 0 .3rem; border-top:1px solid var(--line); padding-top:.8rem}
+  .reviewhead{font-family:var(--mono); font-size:.58rem; letter-spacing:.2em; text-transform:uppercase; color:var(--paper-faint); margin-bottom:.5rem}
+  .rowitem{display:flex; gap:.7rem; padding:.32rem 0; font-size:.74rem; text-align:left; border-bottom:1px solid rgba(232,230,225,.05)}
+  .rowitem b{font-family:var(--display); color:var(--gold); letter-spacing:.03em; flex:0 0 40%; font-weight:500}
+  .rowitem span{color:var(--paper-dim)}
+  .endbtns{display:flex; gap:.5rem; flex-wrap:wrap; justify-content:center; margin-top:.9rem}
+  .hidden{display:none!important}
+
+  @media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Battle mode</h1>
+  <p class="sub">The board floods with phrasal verbs. Clear it by matching every word to the meaning shown.</p>
+</header>
+
+<div id="frame">
+
+  <!-- SETUP -->
+  <section class="setup" id="setup">
+    <div class="group">
+      <div class="grouplabel">Words on the board</div>
+      <div class="pills" id="countPills">
+        <button class="pill" data-n="20" aria-pressed="false">20</button>
+        <button class="pill" data-n="40" aria-pressed="true">40</button>
+        <button class="pill" data-n="60" aria-pressed="false">60</button>
+        <button class="pill" data-n="80" aria-pressed="false">80</button>
+      </div>
+    </div>
+
+    <div class="group">
+      <div class="grouplabel">Prompt style</div>
+      <div class="pills" id="modePills">
+        <button class="pill" data-mode="def" aria-pressed="false">Definition</button>
+        <button class="pill" data-mode="cloze" aria-pressed="true">Sentence</button>
+        <button class="pill" data-mode="mixed" aria-pressed="false">Mixed</button>
+      </div>
+      <p class="modehint" id="modeHint"></p>
+    </div>
+
+    <button class="cta" id="startBtn">Start battle</button>
+    <p class="best" id="bestLabel">Fastest clear: <b>—</b></p>
+  </section>
+
+  <!-- GAME -->
+  <section id="game" class="hidden" style="flex:1; flex-direction:column; min-height:0">
+    <div class="hud">
+      <span class="left"><span class="val" id="leftVal">40</span> left</span>
+      <span class="miss"><span class="val" id="missVal">0</span> missed</span>
+      <span class="spacer"></span>
+      <span class="streak" id="streakLabel">streak <span class="val" id="streakVal">0</span></span>
+      <span class="time val" id="timeVal">0:00</span>
+    </div>
+    <div class="track"><div class="fill" id="fill"></div></div>
+
+    <div class="prompt">
+      <div class="promptlabel" id="promptLabel">Find the phrase that means</div>
+      <p class="prompttext" id="promptText">…</p>
+    </div>
+
+    <div class="field" id="field"></div>
+    <div class="toast" id="toast"></div>
+  </section>
+
+  <!-- END -->
+  <section id="end" class="end hidden">
+    <div class="big" id="endTime">0:00</div>
+    <p class="stat" id="endStat"></p>
+    <p class="pb" id="pbLine"></p>
+    <div class="review hidden" id="review">
+      <div class="reviewhead" id="reviewHead">Worth another look</div>
+      <div id="reviewList"></div>
+    </div>
+    <div class="endbtns">
+      <button class="cta" id="drillBtn">Drill the misses</button>
+      <button class="cta ghost" id="againBtn">Same again</button>
+      <button class="cta ghost" id="menuBtn">Change setup</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ------------------------------------------------------------------
+   ITEM BANK
+   One form ↔ one meaning per entry. Cloze sentences are written so the
+   base form always fits the slot — no tense mismatch between prompt
+   and tile.
+------------------------------------------------------------------- */
+const POOL = [
+  {p:'GIVE UP',          m:'to stop trying',                  s:'He refused to ___ after the third failure.'},
+  {p:'PUT OFF',          m:'to postpone',                     s:"Don't ___ the dentist any longer."},
+  {p:'LOOK INTO',        m:'to investigate',                  s:'The manager promised to ___ the complaint.'},
+  {p:'TAKE AFTER',       m:'to resemble a relative',          s:'People say I ___ my grandmother.'},
+  {p:'CALL OFF',         m:'to cancel',                       s:'They had to ___ the match because of the storm.'},
+  {p:'BRING UP',         m:'to raise a topic',                s:"I didn't want to ___ the subject at dinner."},
+  {p:'RUN INTO',         m:'to meet by chance',               s:'I sometimes ___ old classmates downtown.'},
+  {p:'FIGURE OUT',       m:'to understand after thought',     s:'It took me an hour to ___ the instructions.'},
+  {p:'SET UP',           m:'to arrange or establish',         s:'They want to ___ a new office in Lisbon.'},
+  {p:'COME ACROSS',      m:'to find by chance',               s:'You might ___ a few rare books in there.'},
+  {p:'BACK OUT',         m:'to withdraw from a commitment',   s:'He tried to ___ of the deal at the last minute.'},
+  {p:'CARRY ON',         m:'to continue',                     s:'Please ___ without me.'},
+  {p:'DROP OFF',         m:'to deliver on the way',           s:'Can you ___ the keys tomorrow morning?'},
+  {p:'GET OVER',         m:'to recover from',                 s:'It took her months to ___ the flu.'},
+  {p:'HOLD ON',          m:'to wait',                         s:'Could you ___ for a second?'},
+  {p:'MAKE UP',          m:'to invent a story',               s:'Kids love to ___ stories about monsters.'},
+  {p:'TURN DOWN',        m:'to reject an offer',              s:'She had to ___ the job in Berlin.'},
+  {p:'PUT UP WITH',      m:'to tolerate',                     s:"I can't ___ that noise any longer."},
+  {p:'GET ALONG',        m:'to have a good relationship',     s:'Do you ___ with your neighbours?'},
+  {p:'LOOK FORWARD TO',  m:'to await with pleasure',          s:'I ___ seeing you next week.'},
+  {p:'POINT OUT',        m:'to draw attention to',            s:'Let me ___ one small problem.'},
+  {p:'SORT OUT',         m:'to resolve or organise',          s:'We need to ___ this mess before Friday.'},
+  {p:'COUNT ON',         m:'to rely on',                      s:'You can always ___ me.'},
+  {p:'GO OVER',          m:'to review carefully',             s:'Let’s ___ the notes one more time.'},
+];
+
+const HINTS = {
+  def:   'Meaning first. Fastest recognition drill — good for a first pass over new items.',
+  cloze: 'A sentence with a gap. Forces you to read the item in context, which is how phrasal verbs are actually disambiguated.',
+  mixed: 'Alternates between the two. Varied retrieval cues make the memory trace harder to cue-strip.'
+};
+
+/* grid slots exceed word count so the board keeps negative space to scan through */
+const GRID = {20:{c:7,r:4}, 40:{c:9,r:6}, 60:{c:11,r:7}, 80:{c:12,r:9}};
+const TIERS = [30,21,15];                       // deliberate 3-step type scale, not random sizes
+const TONES = ['var(--paper)','rgba(232,230,225,.72)','var(--gold)'];
+
+let wordCount = 40, mode = 'cloze';
+let itemSet = null;                              // null = full pool; array = drill subset
+let board = [], remaining = 0, misses = 0, streak = 0, bestStreak = 0, elapsed = 0;
+let target = null, lastTarget = null, clock = null;
+let weight = {}, missed = new Map(), lastRun = null;
+const personalBest = {};                         // in-memory only; swap for storage in production
+
+const $ = id => document.getElementById(id);
+const shuffle = a => { const b=[...a]; for(let i=b.length-1;i>0;i--){const j=(Math.random()*(i+1))|0; [b[i],b[j]]=[b[j],b[i]];} return b; };
+const fmt = s => Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+
+/* ---------- setup wiring ---------- */
+function bindPills(container, cb){
+  $(container).addEventListener('click', e => {
+    const btn = e.target.closest('.pill'); if(!btn) return;
+    $(container).querySelectorAll('.pill').forEach(b=>b.setAttribute('aria-pressed','false'));
+    btn.setAttribute('aria-pressed','true');
+    cb(btn);
+  });
+}
+bindPills('countPills', b => { wordCount = +b.dataset.n; showBest(); });
+bindPills('modePills',  b => { mode = b.dataset.mode; $('modeHint').textContent = HINTS[mode]; });
+$('modeHint').textContent = HINTS[mode];
+
+function showBest(){
+  const pb = personalBest[wordCount];
+  $('bestLabel').innerHTML = 'Fastest clear: <b>'+(pb===undefined?'—':fmt(pb))+'</b>';
+}
+
+$('startBtn').onclick = () => { itemSet = null; start(); };
+$('againBtn').onclick = () => { itemSet = null; start(); };
+$('drillBtn').onclick = () => { itemSet = [...missed.values()]; start(); };
+$('menuBtn').onclick  = () => { $('end').classList.add('hidden'); $('setup').classList.remove('hidden'); showBest(); };
+
+/* ---------- board build ---------- */
+function start(){
+  const items = itemSet && itemSet.length ? itemSet : POOL;
+  const total = itemSet && itemSet.length ? Math.min(wordCount, items.length*3) : wordCount;
+
+  remaining = total; misses = 0; streak = 0; bestStreak = 0; elapsed = 0;
+  target = null; lastTarget = null; weight = {}; missed = new Map();
+  lastRun = {total, items};
+
+  $('setup').classList.add('hidden'); $('end').classList.add('hidden');
+  $('game').classList.remove('hidden'); $('game').style.display='flex';
+
+  const dims = GRID[wordCount];
+  const field = $('field');
+  field.innerHTML = '';
+  field.style.gridTemplateColumns = `repeat(${dims.c},1fr)`;
+  field.style.gridTemplateRows    = `repeat(${dims.r},1fr)`;
+
+  /* even coverage: cycle a reshuffled pool instead of sampling with replacement,
+     so no item is over- or under-rehearsed within a round */
+  const seq = [];
+  while(seq.length < total) seq.push(...shuffle(items));
+  seq.length = total;
+
+  const cells = shuffle([...Array(dims.c*dims.r).keys()]).slice(0,total);
+  board = seq.map((w,i)=>{
+    const el = document.createElement('button');
+    el.className = 'word';
+    el.textContent = w.p;
+    el.dataset.phrase = w.p;
+    el.dataset.tier = TIERS[i % 3];
+    el.style.gridColumn = (cells[i] % dims.c) + 1;
+    el.style.gridRow = Math.floor(cells[i] / dims.c) + 1;
+    el.style.color = TONES[(i*7) % TONES.length];
+    el.style.animationDelay = (Math.random()*.45).toFixed(2)+'s';
+    el.onclick = () => hit(el, w);
+    field.appendChild(el);
+    return el;
+  });
+
+  items.forEach(w => weight[w.p] = 1);
+  requestAnimationFrame(fitText);
+  updateHUD();
+  nextTarget();
+  clearInterval(clock);
+  clock = setInterval(()=>{ elapsed++; $('timeVal').textContent = fmt(elapsed); }, 1000);
+}
+
+/* scale each tile to its own cell — long phrases no longer overflow the column */
+function fitText(){
+  const dims = GRID[wordCount], field = $('field');
+  const cellW = field.clientWidth / dims.c - 6;
+  const cellH = field.clientHeight / dims.r - 4;
+  board.forEach(el=>{
+    const chars = el.dataset.phrase.length;
+    const byWidth = cellW / (chars * .60);
+    el.style.fontSize = Math.max(8, Math.min(+el.dataset.tier, byWidth, cellH * .8)) + 'px';
+  });
+}
+addEventListener('resize', () => { if(board.length) fitText(); });
+
+/* ---------- prompting ---------- */
+function nextTarget(){
+  const live = [...new Set(board.map(el=>el.dataset.phrase))];
+  if(!live.length) return;
+  let choices = live.length > 1 ? live.filter(p => p !== lastTarget) : live;
+
+  /* items you got wrong come back sooner and more often */
+  const bag = [];
+  choices.forEach(p => { for(let i=0;i<(weight[p]||1);i++) bag.push(p); });
+  const phrase = bag[(Math.random()*bag.length)|0];
+
+  target = POOL.find(w => w.p === phrase);
+  lastTarget = phrase;
+
+  const useCloze = mode === 'cloze' || (mode === 'mixed' && Math.random() < .5);
+  if(useCloze){
+    $('promptLabel').textContent = 'Fill the gap';
+    $('promptText').innerHTML = target.s.replace('___','<span class="gap">______</span>');
+  } else {
+    $('promptLabel').textContent = 'Find the phrase that means';
+    $('promptText').textContent = target.m;
+  }
+}
+
+/* ---------- interaction ---------- */
+function hit(el, word){
+  if(!target) return;
+  if(word.p === target.p){
+    const r = el.getBoundingClientRect(), f = $('field').getBoundingClientRect();
+    spark(r.left - f.left + r.width/2, r.top - f.top + r.height/2);
+    el.classList.add('gone');
+    setTimeout(()=>el.remove(), 300);
+    board = board.filter(b => b !== el);
+    remaining--; streak++; bestStreak = Math.max(bestStreak, streak);
+    weight[word.p] = Math.max(1, (weight[word.p]||1) - 1);
+    hideToast();
+    updateHUD();
+    if(remaining === 0){ finish(); return; }
+    nextTarget();
+  } else {
+    misses++; streak = 0;
+    weight[target.p] = Math.min(5, (weight[target.p]||1) + 2);
+    missed.set(word.p, word);
+    missed.set(target.p, target);
+    el.classList.add('wrong');
+    setTimeout(()=>el.classList.remove('wrong'), 280);
+    /* the error itself becomes input: name what the wrong tile actually means */
+    showToast(`<b>${word.p}</b> <span>means ${word.m}. Keep looking.</span>`);
+    updateHUD();
+  }
+}
+
+let toastTimer;
+function showToast(html){
+  const t = $('toast'); t.innerHTML = html; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(hideToast, 2600);
+}
+function hideToast(){ $('toast').classList.remove('show'); }
+
+function spark(x,y){
+  const field = $('field');
+  const cols = ['#C9A961','#FFD94A','#5ED39B','#e8e6e1'];
+  for(let i=0;i<7;i++){
+    const p = document.createElement('div');
+    p.className = 'spark';
+    p.style.left = x+'px'; p.style.top = y+'px';
+    p.style.background = cols[(Math.random()*cols.length)|0];
+    p.style.transition = 'transform .45s ease-out, opacity .45s ease-out';
+    field.appendChild(p);
+    const a = Math.random()*Math.PI*2, d = 16 + Math.random()*24;
+    requestAnimationFrame(()=>{
+      p.style.transform = `translate(${Math.cos(a)*d}px,${Math.sin(a)*d}px)`;
+      p.style.opacity = '0';
+    });
+    setTimeout(()=>p.remove(), 470);
+  }
+}
+
+function updateHUD(){
+  const total = lastRun.total;
+  $('leftVal').textContent = remaining;
+  $('missVal').textContent = misses;
+  $('streakVal').textContent = streak;
+  $('streakLabel').classList.toggle('hot', streak >= 5);
+  $('fill').style.width = ((total - remaining) / total * 100) + '%';
+}
+
+/* ---------- end screen ---------- */
+function finish(){
+  clearInterval(clock);
+  hideToast();
+  $('game').classList.add('hidden');
+  $('end').classList.remove('hidden');
+
+  const total = lastRun.total;
+  const accuracy = Math.round(total / (total + misses) * 100);
+  $('endTime').textContent = fmt(elapsed);
+  $('endStat').textContent = `${total} cleared · ${accuracy}% accuracy · best streak ${bestStreak}`;
+
+  const prev = personalBest[wordCount];
+  const pb = $('pbLine');
+  if(!itemSet && (prev === undefined || elapsed < prev)){
+    personalBest[wordCount] = elapsed;
+    pb.textContent = 'New fastest clear'; pb.className = 'pb new';
+  } else {
+    pb.textContent = prev === undefined ? '' : 'Fastest clear: '+fmt(prev);
+    pb.className = 'pb old';
+  }
+
+  const list = [...missed.values()];
+  $('review').classList.toggle('hidden', list.length === 0);
+  $('drillBtn').classList.toggle('hidden', list.length === 0);
+  if(list.length){
+    $('reviewHead').textContent = `Worth another look — ${list.length} item${list.length>1?'s':''}`;
+    $('reviewList').innerHTML = list.map(w =>
+      `<div class="rowitem"><b>${w.p}</b><span>${w.m}</span></div>`).join('');
+    $('drillBtn').textContent = `Drill these ${list.length}`;
+  }
+  showBest();
+}
+
+showBest();
+</script>
+</body>
+</html>
