@@ -14,7 +14,7 @@
   :root{
     --gold:#C9A961; --gold-glow:rgba(201,169,97,.4);
     --mode-accent:#FFD94A; --mode-accent-rgb:255,217,74;
-    --header-h:88px;
+    --header-h:116px;
     --bar-h:34px;
 
     --clear:#5ED39B; --wrong:#E86A5C;
@@ -78,6 +78,35 @@
     .mode-btn .mode-label{ display:none; }
     .mode-btn{ padding:.5rem .6rem .5rem .5rem; }
   }
+
+  /* ── SET TABS — the quiz page's verb strip, same construction.
+     These replace the grid of cards that used to sit inside the card: the
+     sets are navigation, so they belong in the header with the other
+     navigation, and the card is left for the thing being played. */
+  .verb-tabs{
+    display:flex; align-items:center; justify-content:center;
+    gap:.28rem; overflow-x:auto; padding:0 .5rem; scrollbar-width:none;
+  }
+  .verb-tabs::-webkit-scrollbar{ display:none; }
+  .vtab{
+    font-family:'Space Grotesk',sans-serif; font-size:.56rem; font-weight:700;
+    letter-spacing:.08em; text-transform:uppercase;
+    padding:.28rem .72rem; border-radius:999px; border:1px solid transparent;
+    color:rgba(255,255,255,.3); transition:all .2s; white-space:nowrap; flex-shrink:0;
+  }
+  .vtab:hover{ color:rgba(255,255,255,.7); border-color:rgba(255,255,255,.15); }
+  .vtab.active{
+    color:var(--vc, var(--gold)); border-color:var(--vc, var(--gold));
+    background:rgba(255,255,255,.06);
+  }
+  .vtab::after{
+    content:''; display:inline-block; width:5px; height:5px; border-radius:50%;
+    margin-left:.4rem; vertical-align:middle; opacity:0; transition:opacity .3s;
+  }
+  .vtab.score-perfect::after{ background:var(--clear); opacity:1; box-shadow:0 0 6px rgba(94,211,155,.6); }
+  .vtab.score-great::after  { background:#7dd3fc; opacity:1; }
+  .vtab.score-ok::after     { background:#fb923c; opacity:1; }
+  .vtab.score-poor::after   { background:var(--wrong); opacity:1; }
 
   /* ── STAGE + CARD — same frame the quiz uses ── */
   .stage{
@@ -144,21 +173,6 @@
     font-family:'DM Mono',monospace; font-size:.58rem; letter-spacing:.2em; text-transform:uppercase;
     color:rgba(229,229,231,.4); margin:.7rem 0 .55rem;
   }
-  .verbgrid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(112px,1fr)); gap:.5rem; margin-bottom:1.2rem; }
-  .verbcard{
-    position:relative; cursor:pointer; text-align:left; border:1px solid var(--line); border-radius:10px;
-    padding:.65rem .7rem; background:rgba(255,255,255,.02); overflow:hidden;
-    display:flex; flex-direction:column; gap:.25rem; min-height:64px;
-    transition:transform .12s, border-color .12s, background .12s;
-  }
-  .verbcard::before{ content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--vcolor,var(--gold)); opacity:.55; }
-  .verbcard:hover{ transform:translateY(-2px); border-color:rgba(255,255,255,.28); background:rgba(255,255,255,.045); }
-  .verbcard .vname{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:.82rem; }
-  .verbcard .vmeta{ font-family:'DM Mono',monospace; font-size:.56rem; color:var(--paper-faint); }
-  .verbcard .vstars{ font-size:.62rem; letter-spacing:.1em; color:var(--mode-accent); min-height:.9em; }
-  .verbcard.mastered{ border-color:rgba(255,217,74,.4); background:rgba(255,217,74,.05); }
-  .verbcard.mastered .vname{ color:var(--mode-accent); }
-
   .mixgrid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(148px,1fr)); gap:.6rem; }
   .mixcard{
     cursor:pointer; text-align:left; border:1px solid var(--line); border-radius:10px; padding:.7rem .8rem .6rem;
@@ -247,8 +261,7 @@
   #stageup .tap{ font-family:'DM Mono',monospace; font-size:.6rem; color:var(--paper-faint); margin-top:1.4rem; }
 
   @media(max-width:600px){
-    :root{ --header-h:78px; }
-    .verbgrid{ grid-template-columns:repeat(auto-fill,minmax(96px,1fr)); }
+    :root{ --header-h:100px; }
     #menu{ padding:.9rem .9rem 1.4rem; }
   }
 </style>
@@ -273,6 +286,7 @@
     <button class="mode-btn" data-href="phrasal-verbs-quiz.html"><span class="mode-icon">🔗</span><span class="mode-label">Match</span></button>
     <button class="mode-btn active"><span class="mode-icon">🎯</span><span class="mode-label">Play</span><span class="mode-badge">2m</span></button>
   </div>
+  <div class="verb-tabs" id="verbTabs"></div>
 </header>
 
 <div class="stage">
@@ -282,9 +296,6 @@
     <section class="screen active" id="menu">
       <div class="stagebar" id="stagebar"></div>
       <div class="stagecaption" id="stagecaption"></div>
-
-      <div class="sectiontitle">Practice one set</div>
-      <div class="verbgrid" id="verbgrid"></div>
 
       <div class="sectiontitle">Revision — every set shuffled together</div>
       <div class="mixgrid" id="revgrid"></div>
@@ -529,19 +540,7 @@ function renderMenu(){
   $('barStage').innerHTML = `Stage <b>${STAGES[stageIdx].label}</b> · ${cleared}/${N_GROUPS} sets`;
   $('barHit').textContent = 0; $('barMiss').textContent = 0;
 
-  const vgrid = $('verbgrid'); vgrid.innerHTML = '';
-  GROUPS.forEach(g => {
-    const res = progress.groupResults[g.id];
-    const card = document.createElement('div');
-    card.className = 'verbcard' + (groupMastered(g) ? ' mastered' : '');
-    card.style.setProperty('--vcolor', g.color);
-    card.innerHTML = `
-      <span class="vname">${g.label}</span>
-      <span class="vmeta">${g.items.length} phrase${g.items.length===1?'':'s'}${res ? ` · best ${Math.round(res.bestAccuracy*100)}%` : ''}</span>
-      <span class="vstars">${res ? starsFor(res.bestAccuracy) : ''}</span>`;
-    card.onclick = () => startGroup(g.id);
-    vgrid.appendChild(card);
-  });
+  buildTabs();
 
   const rgrid = $('revgrid'); rgrid.innerHTML = '';
   REVISION_MIXES.forEach((mix,i) => {
@@ -569,6 +568,36 @@ function renderMenu(){
   tc.onclick = all ? startTrial : null;
 }
 
+/* ---------- set tabs ----------
+   The dot carries what the cards used to spell out: every phrase met at
+   least once shows green, otherwise the best accuracy so far. */
+let activeGroupId = null;
+
+function tabStateClass(g){
+  if (groupMastered(g)) return ' score-perfect';
+  const res = progress.groupResults[g.id];
+  if (!res) return '';
+  if (res.bestAccuracy >= 0.7) return ' score-great';
+  if (res.bestAccuracy >= CLEAR_THRESHOLD) return ' score-ok';
+  return ' score-poor';
+}
+
+function buildTabs(){
+  const wrap = $('verbTabs');
+  wrap.innerHTML = '';
+  GROUPS.forEach(g => {
+    const btn = document.createElement('button');
+    btn.className = 'vtab' + tabStateClass(g) + (g.id === activeGroupId ? ' active' : '');
+    btn.textContent = g.label;
+    btn.style.setProperty('--vc', g.color);
+    btn.title = `${g.items.length} phrase${g.items.length===1?'':'s'}`;
+    btn.onclick = () => { stopRound(); startGroup(g.id); };
+    wrap.appendChild(btn);
+  });
+  const on = wrap.querySelector('.vtab.active');
+  if (on) on.scrollIntoView({ inline:'center', block:'nearest' });
+}
+
 /* ======================================================================
    ROUND
 ====================================================================== */
@@ -576,6 +605,8 @@ let round = null;
 
 function startGroup(id){
   const g = GROUPS.find(x => x.id === id);
+  activeGroupId = id;
+  buildTabs();
   beginRound({ mode:'group', index:id, pool:g.items, label:`${g.label} · match this meaning`, accent:g.color });
 }
 function startRevision(i){
