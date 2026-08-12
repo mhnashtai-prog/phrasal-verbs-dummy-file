@@ -322,14 +322,18 @@
 .menunudge .mn-text{
   font-family:'Architects Daughter', cursive;
   font-weight:600;
-  font-size:clamp(1,8rem,5,5vw,2,5rem); line-height:1.8;
+  font-size:clamp(2rem,5.5vw,2.8rem); line-height:2;
   color:#2f4ea8; text-align:center;
-  border:1px solid rgba(0,0,0,.14); border-radius:5px;
+  border:1px solid rgba(0,0,0,.22);
+  outline:1px solid rgba(255,255,255,.5);
+  outline-offset:-3px;
+  border-radius:3px;
   padding:1.1rem 1.8rem 1rem;
   background:#f7f4ea;
   box-shadow:0 10px 26px rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.2);
+  transform-origin: top center;
   transform:rotate(-.6deg);
-animation: noteSway 2.2s cubic-bezier(.45,.05,.55,.95) infinite;
+  animation: noteSway 2.2s cubic-bezier(.45,.05,.55,.95) infinite;
 }
 
 .menunudge .mn-text::before{
