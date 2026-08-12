@@ -1,7 +1,7 @@
 {
  "title": "Phrasal Verbs",
  "level": "B2",
- "note": "Generated from data/grammar-rules/phrasal-verbs-complete-set.json. A pair is included only when it has BOTH a meaning and a gapped example sentence; pairs with a meaning alone are listed in `missingExamples` \u2014 writing those is what unlocks the remaining verbs. Quiz options are the correct particle plus three others used with the SAME verb, so a wrong answer is plausible rather than silly.",
+ "note": "Hand-maintained; not generated from any other file. Core verbs stand alone; lower-frequency verbs are amalgamated into MIX sets so every set is worth a round and the whole course fits one row of tabs. Items in a MIX carry their own `verb`; `form` holds the inflected verb an example sentence needs. Renderers must use form || verb || group.id. Options are the correct particle plus three others used with the SAME verb.",
  "missingExamples": [
   "break away",
   "break down",
@@ -110,6 +110,7 @@
    "id": "take",
    "label": "TAKE",
    "color": "#C9A961",
+   "colorRgb": "201,169,97",
    "items": [
     {
      "particle": "off",
@@ -179,12 +180,13 @@
     },
     {
      "particle": "aback",
+     "form": "taken",
      "meaning": "to surprise or shock someone",
-     "example": "Such blunt criticism can easily _____ a young, inexperienced manager.",
+     "example": "Young managers can be _____ by such blunt criticism.",
      "options": [
       "aback",
-      "back",
       "along",
+      "apart",
       "away"
      ]
     },
@@ -196,7 +198,7 @@
       "along",
       "apart",
       "away",
-      "in"
+      "back"
      ]
     },
     {
@@ -218,7 +220,7 @@
       "away",
       "along",
       "apart",
-      "in"
+      "off"
      ]
     },
     {
@@ -266,34 +268,35 @@
      ]
     },
     {
-     "particle": "about",
-     "meaning": "to guide or show someone around a place",
-     "example": "An enthusiastic guide agreed to _____ our whole group before the museum's official opening.",
+     "particle": "around",
+     "meaning": "to guide someone through a place, showing them what is there",
+     "example": "An enthusiastic guide offered to _____ anyone who arrived before opening time.",
      "options": [
-      "about",
+      "around",
       "along",
-      "for",
-      "through"
+      "away",
+      "in"
      ]
     },
     {
      "particle": "through",
+     "form": "taken",
      "meaning": "to guide someone step by step through information or a process",
-     "example": "The consultant offered to _____ the whole team before the big client meeting.",
+     "example": "New staff will be _____ the safety procedure on their first day.",
      "options": [
       "through",
       "over",
-      "about",
+      "round",
       "to"
      ]
     }
-   ],
-   "colorRgb": "201,169,97"
+   ]
   },
   {
    "id": "go",
    "label": "GO",
    "color": "#3fbfb2",
+   "colorRgb": "63,191,178",
    "items": [
     {
      "particle": "out",
@@ -458,7 +461,8 @@
       "down",
       "out",
       "off"
-     ]
+     ],
+     "form": "went"
     },
     {
      "particle": "on",
@@ -493,13 +497,13 @@
       "ahead"
      ]
     }
-   ],
-   "colorRgb": "63,191,178"
+   ]
   },
   {
    "id": "look",
    "label": "LOOK",
    "color": "#e85a4f",
+   "colorRgb": "232,90,79",
    "items": [
     {
      "particle": "after",
@@ -655,13 +659,13 @@
       "at"
      ]
     }
-   ],
-   "colorRgb": "232,90,79"
+   ]
   },
   {
    "id": "get",
    "label": "GET",
    "color": "#5B9BD5",
+   "colorRgb": "91,155,213",
    "items": [
     {
      "particle": "up",
@@ -850,98 +854,13 @@
       "across"
      ]
     }
-   ],
-   "colorRgb": "91,155,213"
-  },
-  {
-   "id": "keep",
-   "label": "KEEP",
-   "color": "#9a6baa",
-   "items": [
-    {
-     "particle": "up",
-     "meaning": "to continue at the same rate; to maintain standards",
-     "example": "Well done! _____ the good work and you'll pass the exam.",
-     "options": [
-      "up",
-      "off",
-      "away",
-      "out"
-     ]
-    },
-    {
-     "particle": "off",
-     "meaning": "to stay away from; to avoid",
-     "example": "_____ the grass! There's a sign saying not to walk on it.",
-     "options": [
-      "off",
-      "up",
-      "away",
-      "out"
-     ]
-    },
-    {
-     "particle": "away",
-     "meaning": "to remain at a distance; to prevent from approaching",
-     "example": "Try to _____ from junk food if you want to lose weight.",
-     "options": [
-      "away",
-      "up",
-      "off",
-      "out"
-     ]
-    },
-    {
-     "particle": "out",
-     "meaning": "to remain outside; to prevent from entering",
-     "example": "Please _____ of the kitchen while I'm cooking dinner.",
-     "options": [
-      "out",
-      "up",
-      "off",
-      "away"
-     ]
-    },
-    {
-     "particle": "to",
-     "meaning": "to stay within limits; to fulfill a promise or arrangement",
-     "example": "You must _____ your promise to help with the school concert.",
-     "options": [
-      "to",
-      "up",
-      "off",
-      "away"
-     ]
-    },
-    {
-     "particle": "down",
-     "meaning": "to control or limit; to remain at a low level",
-     "example": "The doctor advised him to _____ his cholesterol levels.",
-     "options": [
-      "down",
-      "up",
-      "off",
-      "away"
-     ]
-    },
-    {
-     "particle": "in",
-     "meaning": "to not reveal information; to confine",
-     "example": "They decided to _____ the news until after the wedding.",
-     "options": [
-      "in",
-      "up",
-      "off",
-      "away"
-     ]
-    }
-   ],
-   "colorRgb": "154,107,170"
+   ]
   },
   {
    "id": "put",
    "label": "PUT",
    "color": "#f0a23c",
+   "colorRgb": "240,162,60",
    "items": [
     {
      "particle": "off",
@@ -1051,7 +970,8 @@
       "across",
       "aside",
       "forward"
-     ]
+     ],
+     "form": "putting"
     },
     {
      "particle": "across",
@@ -1086,109 +1006,223 @@
       "out"
      ]
     }
-   ],
-   "colorRgb": "240,162,60"
+   ]
   },
   {
-   "id": "turn",
-   "label": "TURN",
-   "color": "#5a9657",
+   "id": "come",
+   "label": "COME",
+   "color": "#4a7fb5",
+   "colorRgb": "74,127,181",
    "items": [
     {
-     "particle": "on",
-     "meaning": "to switch on; to attack suddenly",
-     "example": "Can you _____ the lights when you come in? It's dark.",
+     "particle": "up with",
+     "meaning": "to think of an idea or plan",
+     "example": "We need to _____ a solution to this problem by tomorrow.",
      "options": [
-      "on",
-      "off",
-      "up",
-      "down"
-     ]
-    },
-    {
-     "particle": "off",
-     "meaning": "to switch off; to cause to lose interest",
-     "example": "Don't forget to _____ your computer before you leave work.",
-     "options": [
-      "off",
-      "on",
-      "up",
-      "down"
-     ]
-    },
-    {
-     "particle": "up",
-     "meaning": "to arrive; to increase volume; to be found",
-     "example": "Could you _____ the volume? I can't hear the TV properly.",
-     "options": [
-      "up",
-      "on",
-      "off",
-      "down"
-     ]
-    },
-    {
-     "particle": "down",
-     "meaning": "to refuse; to reduce volume",
-     "example": "Please _____ the music - the neighbors are complaining again!",
-     "options": [
-      "down",
-      "on",
-      "off",
-      "up"
-     ]
-    },
-    {
-     "particle": "over",
-     "meaning": "to flip to the other side; to hand over to authorities",
-     "example": "Remember to _____ your exam paper when the time is up.",
-     "options": [
-      "over",
-      "on",
-      "off",
-      "up"
+      "up with",
+      "back",
+      "about",
+      "across"
      ]
     },
     {
      "particle": "back",
-     "meaning": "to return the way you came; to fold back",
-     "example": "It's too late to _____ now - we're already committed to the plan.",
+     "meaning": "to return; to become fashionable again",
+     "example": "What time will you _____ from your trip to Paris tomorrow?",
      "options": [
       "back",
-      "on",
-      "off",
-      "up"
+      "up with",
+      "about",
+      "across"
      ]
     },
     {
-     "particle": "away",
-     "meaning": "to refuse entry; to look in a different direction",
-     "example": "The hotel had to _____ guests because they were fully booked.",
+     "particle": "about",
+     "meaning": "to happen or occur",
+     "example": "It's still unclear how the confusion _____ in the first place.",
      "options": [
-      "away",
-      "on",
-      "off",
+      "about",
+      "across",
+      "along",
+      "up"
+     ],
+     "form": "came"
+    },
+    {
+     "particle": "across",
+     "meaning": "to find by chance",
+     "example": "I _____ an old photo album while cleaning the attic.",
+     "options": [
+      "across",
+      "about",
+      "along",
+      "up"
+     ],
+     "form": "came"
+    },
+    {
+     "particle": "along",
+     "meaning": "to arrive or progress",
+     "example": "The new project should _____ well if we keep working hard.",
+     "options": [
+      "along",
+      "about",
+      "around",
       "up"
      ]
     },
     {
      "particle": "around",
-     "meaning": "to face the opposite direction; to improve a bad situation",
-     "example": "_____ and face me when I'm talking to you!",
+     "meaning": "to change one's opinion or recover consciousness",
+     "example": "It usually takes him a while to _____ after an argument.",
      "options": [
       "around",
-      "on",
+      "along",
+      "about",
+      "at"
+     ]
+    },
+    {
+     "particle": "at",
+     "meaning": "to attack or approach aggressively",
+     "example": "The dog suddenly began to _____ the mailman aggressively.",
+     "options": [
+      "at",
+      "away",
+      "around",
+      "off"
+     ]
+    },
+    {
+     "particle": "away",
+     "meaning": "to depart from a place or leave with an impression",
+     "example": "I _____ from the meeting with a much better understanding.",
+     "options": [
+      "away",
+      "at",
+      "off",
+      "out"
+     ],
+     "form": "came"
+    },
+    {
+     "particle": "down",
+     "meaning": "to fall or be reduced",
+     "example": "Prices are expected to _____ sharply next year.",
+     "options": [
+      "down",
+      "up",
+      "off",
+      "out"
+     ]
+    },
+    {
+     "particle": "in",
+     "meaning": "to enter",
+     "example": "Please _____ and take a seat by the fire.",
+     "options": [
+      "in",
+      "out",
       "off",
       "up"
      ]
+    },
+    {
+     "particle": "off",
+     "meaning": "to succeed or detach",
+     "example": "Did the plan actually _____ in the end?",
+     "options": [
+      "off",
+      "out",
+      "down",
+      "up"
+     ]
+    },
+    {
+     "particle": "out",
+     "meaning": "to be released or revealed",
+     "example": "The truth will eventually _____, no matter how well hidden.",
+     "options": [
+      "out",
+      "off",
+      "up",
+      "in"
+     ]
+    },
+    {
+     "particle": "up",
+     "meaning": "to arise or approach",
+     "example": "An unexpected problem seems to _____ every time we plan a trip.",
+     "options": [
+      "up",
+      "up with",
+      "out",
+      "in"
+     ]
+    },
+    {
+     "particle": "over",
+     "meaning": "(of a feeling) to suddenly affect someone; to visit informally",
+     "example": "A strange feeling of calm seemed to _____ her as she waited for the results.",
+     "options": [
+      "over",
+      "through",
+      "about",
+      "down"
+     ]
+    },
+    {
+     "particle": "with",
+     "meaning": "to be included as part of something",
+     "example": "The new phone _____ a two-year warranty as standard.",
+     "options": [
+      "with",
+      "for",
+      "against",
+      "about"
+     ],
+     "form": "comes"
+    },
+    {
+     "particle": "through",
+     "meaning": "to survive a difficult situation successfully; to arrive (of a message)",
+     "example": "The company managed to _____ the crisis without any job losses.",
+     "options": [
+      "through",
+      "over",
+      "out",
+      "up"
+     ]
+    },
+    {
+     "particle": "for",
+     "meaning": "to criticize or attack someone (informal)",
+     "example": "Critics have started to _____ the minister over his handling of the crisis.",
+     "options": [
+      "for",
+      "against",
+      "at",
+      "with"
+     ]
+    },
+    {
+     "particle": "against",
+     "meaning": "to encounter opposition or a problem",
+     "example": "The proposal is likely to _____ strong opposition from residents.",
+     "options": [
+      "against",
+      "for",
+      "at",
+      "around"
+     ]
     }
-   ],
-   "colorRgb": "90,150,87"
+   ]
   },
   {
    "id": "run",
    "label": "RUN",
    "color": "#c94f6d",
+   "colorRgb": "201,79,109",
    "items": [
     {
      "particle": "out of",
@@ -1300,220 +1334,195 @@
       "by"
      ]
     }
-   ],
-   "colorRgb": "201,79,109"
+   ]
   },
   {
-   "id": "come",
-   "label": "COME",
-   "color": "#4a7fb5",
+   "id": "mix1",
+   "label": "MIX 1",
+   "color": "#8fa3c4",
+   "colorRgb": "143,163,196",
+   "mixed": true,
    "items": [
     {
-     "particle": "up with",
-     "meaning": "to think of an idea or plan",
-     "example": "We need to _____ a solution to this problem by tomorrow.",
+     "particle": "up",
+     "meaning": "to continue at the same rate; to maintain standards",
+     "example": "Well done! _____ the good work and you'll pass the exam.",
      "options": [
-      "up with",
-      "back",
-      "about",
-      "across"
-     ]
-    },
-    {
-     "particle": "back",
-     "meaning": "to return; to become fashionable again",
-     "example": "What time will you _____ from your trip to Paris tomorrow?",
-     "options": [
-      "back",
-      "up with",
-      "about",
-      "across"
-     ]
-    },
-    {
-     "particle": "about",
-     "meaning": "to happen or occur",
-     "example": "It's still unclear how the confusion _____ in the first place.",
-     "options": [
-      "about",
-      "across",
-      "along",
-      "up"
-     ]
-    },
-    {
-     "particle": "across",
-     "meaning": "to find by chance",
-     "example": "I _____ an old photo album while cleaning the attic.",
-     "options": [
-      "across",
-      "about",
-      "along",
-      "up"
-     ]
-    },
-    {
-     "particle": "along",
-     "meaning": "to arrive or progress",
-     "example": "The new project should _____ well if we keep working hard.",
-     "options": [
-      "along",
-      "about",
-      "around",
-      "up"
-     ]
-    },
-    {
-     "particle": "around",
-     "meaning": "to change one's opinion or recover consciousness",
-     "example": "It usually takes him a while to _____ after an argument.",
-     "options": [
-      "around",
-      "along",
-      "about",
-      "at"
-     ]
-    },
-    {
-     "particle": "at",
-     "meaning": "to attack or approach aggressively",
-     "example": "The dog suddenly began to _____ the mailman aggressively.",
-     "options": [
-      "at",
-      "away",
-      "around",
-      "off"
-     ]
-    },
-    {
-     "particle": "away",
-     "meaning": "to depart from a place or leave with an impression",
-     "example": "I _____ from the meeting with a much better understanding.",
-     "options": [
-      "away",
-      "at",
-      "off",
-      "out"
-     ]
-    },
-    {
-     "particle": "down",
-     "meaning": "to fall or be reduced",
-     "example": "Prices are expected to _____ sharply next year.",
-     "options": [
-      "down",
       "up",
       "off",
+      "away",
       "out"
-     ]
-    },
-    {
-     "particle": "in",
-     "meaning": "to enter",
-     "example": "Please _____ and take a seat by the fire.",
-     "options": [
-      "in",
-      "out",
-      "off",
-      "up"
-     ]
+     ],
+     "verb": "keep"
     },
     {
      "particle": "off",
-     "meaning": "to succeed or detach",
-     "example": "Did the plan actually _____ in the end?",
+     "meaning": "to stay away from; to avoid",
+     "example": "_____ the grass! There's a sign saying not to walk on it.",
      "options": [
       "off",
-      "out",
-      "down",
-      "up"
-     ]
+      "up",
+      "away",
+      "out"
+     ],
+     "verb": "keep"
+    },
+    {
+     "particle": "away",
+     "meaning": "to remain at a distance; to prevent from approaching",
+     "example": "Try to _____ from junk food if you want to lose weight.",
+     "options": [
+      "away",
+      "up",
+      "off",
+      "out"
+     ],
+     "verb": "keep"
     },
     {
      "particle": "out",
-     "meaning": "to be released or revealed",
-     "example": "The truth will eventually _____, no matter how well hidden.",
+     "meaning": "to remain outside; to prevent from entering",
+     "example": "Please _____ of the kitchen while I'm cooking dinner.",
      "options": [
       "out",
+      "up",
+      "off",
+      "away"
+     ],
+     "verb": "keep"
+    },
+    {
+     "particle": "to",
+     "meaning": "to stay within limits; to fulfill a promise or arrangement",
+     "example": "You must _____ your promise to help with the school concert.",
+     "options": [
+      "to",
+      "up",
+      "off",
+      "away"
+     ],
+     "verb": "keep"
+    },
+    {
+     "particle": "down",
+     "meaning": "to control or limit; to remain at a low level",
+     "example": "The doctor advised him to _____ his cholesterol levels.",
+     "options": [
+      "down",
+      "up",
+      "off",
+      "away"
+     ],
+     "verb": "keep"
+    },
+    {
+     "particle": "in",
+     "meaning": "to not reveal information; to confine",
+     "example": "They decided to _____ the news until after the wedding.",
+     "options": [
+      "in",
+      "up",
+      "off",
+      "away"
+     ],
+     "verb": "keep"
+    },
+    {
+     "particle": "on",
+     "meaning": "to switch on; to attack suddenly",
+     "example": "Can you _____ the lights when you come in? It's dark.",
+     "options": [
+      "on",
       "off",
       "up",
-      "in"
-     ]
+      "down"
+     ],
+     "verb": "turn"
+    },
+    {
+     "particle": "off",
+     "meaning": "to switch off; to cause to lose interest",
+     "example": "Don't forget to _____ your computer before you leave work.",
+     "options": [
+      "off",
+      "on",
+      "up",
+      "down"
+     ],
+     "verb": "turn"
     },
     {
      "particle": "up",
-     "meaning": "to arise or approach",
-     "example": "An unexpected problem seems to _____ every time we plan a trip.",
+     "meaning": "to arrive; to increase volume; to be found",
+     "example": "Could you _____ the volume? I can't hear the TV properly.",
      "options": [
       "up",
-      "up with",
-      "out",
-      "in"
-     ]
+      "on",
+      "off",
+      "down"
+     ],
+     "verb": "turn"
+    },
+    {
+     "particle": "down",
+     "meaning": "to refuse; to reduce volume",
+     "example": "Please _____ the music - the neighbors are complaining again!",
+     "options": [
+      "down",
+      "on",
+      "off",
+      "up"
+     ],
+     "verb": "turn"
     },
     {
      "particle": "over",
-     "meaning": "(of a feeling) to suddenly affect someone; to visit informally",
-     "example": "A strange feeling of calm seemed to _____ her as she waited for the results.",
+     "meaning": "to flip to the other side; to hand over to authorities",
+     "example": "Remember to _____ your exam paper when the time is up.",
      "options": [
       "over",
-      "through",
-      "about",
-      "down"
-     ]
-    },
-    {
-     "particle": "with",
-     "meaning": "to be included as part of something",
-     "example": "The new phone _____ a two-year warranty as standard.",
-     "options": [
-      "with",
-      "for",
-      "against",
-      "about"
-     ]
-    },
-    {
-     "particle": "through",
-     "meaning": "to survive a difficult situation successfully; to arrive (of a message)",
-     "example": "The company managed to _____ the crisis without any job losses.",
-     "options": [
-      "through",
-      "over",
-      "out",
+      "on",
+      "off",
       "up"
-     ]
+     ],
+     "verb": "turn"
     },
     {
-     "particle": "for",
-     "meaning": "to criticize or attack someone (informal)",
-     "example": "Critics have started to _____ the minister over his handling of the crisis.",
+     "particle": "back",
+     "meaning": "to return the way you came; to fold back",
+     "example": "It's too late to _____ now - we're already committed to the plan.",
      "options": [
-      "for",
-      "against",
-      "at",
-      "with"
-     ]
+      "back",
+      "on",
+      "off",
+      "up"
+     ],
+     "verb": "turn"
     },
     {
-     "particle": "against",
-     "meaning": "to encounter opposition or a problem",
-     "example": "The proposal is likely to _____ strong opposition from residents.",
+     "particle": "away",
+     "meaning": "to refuse entry; to look in a different direction",
+     "example": "The hotel had to _____ guests because they were fully booked.",
      "options": [
-      "against",
-      "for",
-      "at",
-      "around"
-     ]
-    }
-   ],
-   "colorRgb": "74,127,181"
-  },
-  {
-   "id": "bring",
-   "label": "BRING",
-   "color": "#b06a2c",
-   "items": [
+      "away",
+      "on",
+      "off",
+      "up"
+     ],
+     "verb": "turn"
+    },
+    {
+     "particle": "around",
+     "meaning": "to face the opposite direction; to improve a bad situation",
+     "example": "_____ and face me when I'm talking to you!",
+     "options": [
+      "around",
+      "on",
+      "off",
+      "up"
+     ],
+     "verb": "turn"
+    },
     {
      "particle": "up",
      "meaning": "to raise children; to mention a topic",
@@ -1521,9 +1530,10 @@
      "options": [
       "up",
       "about",
-      "across",
-      "after"
-     ]
+      "in",
+      "out"
+     ],
+     "verb": "bring"
     },
     {
      "particle": "about",
@@ -1534,7 +1544,8 @@
       "up",
       "across",
       "after"
-     ]
+     ],
+     "verb": "bring"
     },
     {
      "particle": "back",
@@ -1545,7 +1556,8 @@
       "down",
       "up",
       "out"
-     ]
+     ],
+     "verb": "bring"
     },
     {
      "particle": "down",
@@ -1556,7 +1568,8 @@
       "back",
       "up",
       "off"
-     ]
+     ],
+     "verb": "bring"
     },
     {
      "particle": "forward",
@@ -1567,7 +1580,8 @@
       "back",
       "down",
       "in"
-     ]
+     ],
+     "verb": "bring"
     },
     {
      "particle": "in",
@@ -1578,7 +1592,8 @@
       "out",
       "up",
       "down"
-     ]
+     ],
+     "verb": "bring"
     },
     {
      "particle": "off",
@@ -1589,7 +1604,8 @@
       "out",
       "up",
       "about"
-     ]
+     ],
+     "verb": "bring"
     },
     {
      "particle": "out",
@@ -1600,7 +1616,8 @@
       "off",
       "in",
       "up"
-     ]
+     ],
+     "verb": "bring"
     },
     {
      "particle": "round",
@@ -1611,7 +1628,8 @@
       "back",
       "about",
       "together"
-     ]
+     ],
+     "verb": "bring"
     },
     {
      "particle": "together",
@@ -1622,15 +1640,17 @@
       "round",
       "in",
       "about"
-     ]
+     ],
+     "verb": "bring"
     }
-   ],
-   "colorRgb": "176,106,44"
+   ]
   },
   {
-   "id": "carry",
-   "label": "CARRY",
-   "color": "#1a8f5e",
+   "id": "mix2",
+   "label": "MIX 2",
+   "color": "#c48f9e",
+   "colorRgb": "196,143,158",
+   "mixed": true,
    "items": [
     {
      "particle": "out",
@@ -1638,10 +1658,11 @@
      "example": "Scientists will _____ experiments to test the new drug's safety.",
      "options": [
       "out",
-      "about",
-      "across",
-      "after"
-     ]
+      "on",
+      "off",
+      "through"
+     ],
+     "verb": "carry"
     },
     {
      "particle": "on",
@@ -1652,7 +1673,8 @@
       "through",
       "forward",
       "away"
-     ]
+     ],
+     "verb": "carry"
     },
     {
      "particle": "over",
@@ -1663,7 +1685,8 @@
       "forward",
       "back",
       "through"
-     ]
+     ],
+     "verb": "carry"
     },
     {
      "particle": "through",
@@ -1674,7 +1697,8 @@
       "on",
       "over",
       "off"
-     ]
+     ],
+     "verb": "carry"
     },
     {
      "particle": "away",
@@ -1685,7 +1709,9 @@
       "off",
       "along",
       "over"
-     ]
+     ],
+     "form": "carried",
+     "verb": "carry"
     },
     {
      "particle": "off",
@@ -1696,7 +1722,8 @@
       "away",
       "on",
       "through"
-     ]
+     ],
+     "verb": "carry"
     },
     {
      "particle": "forward",
@@ -1707,7 +1734,8 @@
       "over",
       "back",
       "on"
-     ]
+     ],
+     "verb": "carry"
     },
     {
      "particle": "back",
@@ -1718,7 +1746,8 @@
       "forward",
       "along",
       "away"
-     ]
+     ],
+     "verb": "carry"
     },
     {
      "particle": "along",
@@ -1729,26 +1758,20 @@
       "away",
       "back",
       "on"
-     ]
-    }
-   ],
-   "colorRgb": "26,143,94"
-  },
-  {
-   "id": "work",
-   "label": "WORK",
-   "color": "#7b5ea7",
-   "items": [
+     ],
+     "verb": "carry"
+    },
     {
      "particle": "out",
      "meaning": "to exercise; to solve; to develop successfully",
      "example": "I need to _____ at the gym more regularly to stay fit.",
      "options": [
       "out",
-      "about",
-      "across",
-      "after"
-     ]
+      "on",
+      "up",
+      "through"
+     ],
+     "verb": "work"
     },
     {
      "particle": "on",
@@ -1759,7 +1782,8 @@
       "through",
       "up",
       "off"
-     ]
+     ],
+     "verb": "work"
     },
     {
      "particle": "through",
@@ -1770,7 +1794,8 @@
       "on",
       "around",
       "off"
-     ]
+     ],
+     "verb": "work"
     },
     {
      "particle": "off",
@@ -1781,7 +1806,8 @@
       "up",
       "on",
       "through"
-     ]
+     ],
+     "verb": "work"
     },
     {
      "particle": "up",
@@ -1792,7 +1818,8 @@
       "off",
       "on",
       "around"
-     ]
+     ],
+     "verb": "work"
     },
     {
      "particle": "around",
@@ -1803,216 +1830,9 @@
       "through",
       "on",
       "up"
-     ]
-    }
-   ],
-   "colorRgb": "123,94,167"
-  },
-  {
-   "id": "figure",
-   "label": "FIGURE",
-   "color": "#c2681f",
-   "items": [
-    {
-     "particle": "out",
-     "meaning": "to understand or solve",
-     "example": "Can you help me _____ this math problem? I'm completely stuck.",
-     "options": [
-      "out",
-      "about",
-      "across",
-      "after"
-     ]
-    }
-   ],
-   "colorRgb": "194,104,31"
-  },
-  {
-   "id": "fill",
-   "label": "FILL",
-   "color": "#3d9e95",
-   "items": [
-    {
-     "particle": "in",
-     "meaning": "to complete a form; to substitute; to inform",
-     "example": "Please _____ this application form and return it by Friday.",
-     "options": [
-      "in",
-      "about",
-      "across",
-      "after"
-     ]
-    }
-   ],
-   "colorRgb": "61,158,149"
-  },
-  {
-   "id": "call",
-   "label": "CALL",
-   "color": "#c08b2f",
-   "items": [
-    {
-     "particle": "off",
-     "meaning": "to cancel; to order to stop attacking",
-     "example": "They had to _____ the football match because of heavy rain.",
-     "options": [
-      "off",
-      "back",
-      "up",
-      "about"
-     ]
+     ],
+     "verb": "work"
     },
-    {
-     "particle": "back",
-     "meaning": "to return a phone call; to ask to return",
-     "example": "I'll _____ the client later this evening to discuss the arrangements.",
-     "options": [
-      "back",
-      "off",
-      "up",
-      "about"
-     ]
-    },
-    {
-     "particle": "up",
-     "meaning": "to telephone; to summon for military service",
-     "example": "Let me _____ my friend who's an expert in this field.",
-     "options": [
-      "up",
-      "off",
-      "back",
-      "about"
-     ]
-    }
-   ],
-   "colorRgb": "192,139,47"
-  },
-  {
-   "id": "give",
-   "label": "GIVE",
-   "color": "#6a4374",
-   "items": [
-    {
-     "particle": "up",
-     "meaning": "to stop trying; to surrender",
-     "example": "Don't _____ trying - you can learn anything if you practice enough!",
-     "options": [
-      "up",
-      "away",
-      "about",
-      "across"
-     ]
-    },
-    {
-     "particle": "away",
-     "meaning": "to donate; to reveal a secret",
-     "example": "She decided to _____ her old clothes to charity.",
-     "options": [
-      "away",
-      "up",
-      "about",
-      "across"
-     ]
-    }
-   ],
-   "colorRgb": "106,67,116"
-  },
-  {
-   "id": "pick",
-   "label": "PICK",
-   "color": "#b4453a",
-   "items": [
-    {
-     "particle": "up",
-     "meaning": "to lift; to collect; to learn; to improve",
-     "example": "Can you _____ some milk from the shop on your way home?",
-     "options": [
-      "up",
-      "out",
-      "about",
-      "across"
-     ]
-    },
-    {
-     "particle": "out",
-     "meaning": "to select or identify",
-     "example": "I couldn't _____ my sister from all the people in the crowd.",
-     "options": [
-      "out",
-      "up",
-      "about",
-      "across"
-     ]
-    }
-   ],
-   "colorRgb": "180,69,58"
-  },
-  {
-   "id": "drop",
-   "label": "DROP",
-   "color": "#2f5f8e",
-   "items": [
-    {
-     "particle": "off",
-     "meaning": "to deliver; to fall asleep; to decrease",
-     "example": "I'll _____ the kids at school at 8am tomorrow morning.",
-     "options": [
-      "off",
-      "about",
-      "across",
-      "after"
-     ]
-    }
-   ],
-   "colorRgb": "47,95,142"
-  },
-  {
-   "id": "set",
-   "label": "SET",
-   "color": "#8f5320",
-   "items": [
-    {
-     "particle": "up",
-     "meaning": "to establish; to arrange; to frame someone",
-     "example": "They're planning to _____ a new business in the city center.",
-     "options": [
-      "up",
-      "off",
-      "out",
-      "about"
-     ]
-    },
-    {
-     "particle": "off",
-     "meaning": "to begin a journey; to cause to explode; to enhance by contrast",
-     "example": "What time do you want to _____ for the airport tomorrow morning?",
-     "options": [
-      "off",
-      "up",
-      "out",
-      "about"
-     ]
-    },
-    {
-     "particle": "out",
-     "meaning": "to begin a journey; to intend; to arrange systematically",
-     "example": "We _____ to solve the mystery but found no evidence.",
-     "options": [
-      "out",
-      "up",
-      "off",
-      "about"
-     ]
-    }
-   ],
-   "colorRgb": "143,83,32"
-  },
-  {
-   "id": "make",
-   "label": "MAKE",
-   "color": "#d1495b",
-   "colorRgb": "209,73,91",
-   "items": [
     {
      "particle": "up",
      "meaning": "to resolve differences after an argument; to constitute; to invent a story",
@@ -2022,7 +1842,8 @@
       "out",
       "over",
       "of"
-     ]
+     ],
+     "verb": "make"
     },
     {
      "particle": "out",
@@ -2033,7 +1854,8 @@
       "up",
       "over",
       "of"
-     ]
+     ],
+     "verb": "make"
     },
     {
      "particle": "over",
@@ -2044,18 +1866,21 @@
       "into",
       "up",
       "off"
-     ]
+     ],
+     "verb": "make"
     },
     {
      "particle": "into",
+     "form": "made",
      "meaning": "to transform something into something else",
-     "example": "Developers plan to _____ the old railway station a thriving community centre.",
+     "example": "The old railway station will be _____ a thriving community centre.",
      "options": [
       "into",
       "over",
       "up",
       "of"
-     ]
+     ],
+     "verb": "make"
     },
     {
      "particle": "for",
@@ -2066,7 +1891,8 @@
       "against",
       "of",
       "with"
-     ]
+     ],
+     "verb": "make"
     },
     {
      "particle": "with",
@@ -2077,7 +1903,9 @@
       "off",
       "for",
       "at"
-     ]
+     ],
+     "form": "made",
+     "verb": "make"
     },
     {
      "particle": "off",
@@ -2088,7 +1916,8 @@
       "with",
       "over",
       "at"
-     ]
+     ],
+     "verb": "make"
     },
     {
      "particle": "against",
@@ -2099,7 +1928,8 @@
       "for",
       "of",
       "at"
-     ]
+     ],
+     "verb": "make"
     },
     {
      "particle": "of",
@@ -2110,7 +1940,8 @@
       "out",
       "up",
       "against"
-     ]
+     ],
+     "verb": "make"
     },
     {
      "particle": "at",
@@ -2121,15 +1952,18 @@
       "off",
       "with",
       "against"
-     ]
+     ],
+     "form": "made",
+     "verb": "make"
     }
    ]
   },
   {
-   "id": "see",
-   "label": "SEE",
-   "color": "#8a9a5b",
-   "colorRgb": "138,154,91",
+   "id": "mix3",
+   "label": "MIX 3",
+   "color": "#8fc4a8",
+   "colorRgb": "143,196,168",
+   "mixed": true,
    "items": [
     {
      "particle": "out",
@@ -2140,7 +1974,8 @@
       "to",
       "off",
       "through"
-     ]
+     ],
+     "verb": "see"
     },
     {
      "particle": "to",
@@ -2151,7 +1986,8 @@
       "out",
       "about",
       "for"
-     ]
+     ],
+     "verb": "see"
     },
     {
      "particle": "off",
@@ -2162,7 +1998,8 @@
       "out",
       "in",
       "through"
-     ]
+     ],
+     "verb": "see"
     },
     {
      "particle": "in",
@@ -2173,7 +2010,8 @@
       "off",
       "out",
       "around"
-     ]
+     ],
+     "verb": "see"
     },
     {
      "particle": "through",
@@ -2184,7 +2022,8 @@
       "out",
       "over",
       "about"
-     ]
+     ],
+     "verb": "see"
     },
     {
      "particle": "about",
@@ -2195,7 +2034,8 @@
       "to",
       "over",
       "for"
-     ]
+     ],
+     "verb": "see"
     },
     {
      "particle": "over",
@@ -2206,7 +2046,8 @@
       "around",
       "through",
       "about"
-     ]
+     ],
+     "verb": "see"
     },
     {
      "particle": "for",
@@ -2217,7 +2058,8 @@
       "to",
       "about",
       "against"
-     ]
+     ],
+     "verb": "see"
     },
     {
      "particle": "around",
@@ -2228,18 +2070,177 @@
       "over",
       "in",
       "against"
-     ]
+     ],
+     "verb": "see"
     },
     {
      "particle": "against",
-     "meaning": "to evaluate or interpret something in a wider context",
-     "example": "Analysts should always _____ these figures the wider economic background.",
+     "form": "seen",
+     "meaning": "to judge or interpret something in a wider context",
+     "example": "These figures must be _____ the wider economic background.",
      "options": [
       "against",
       "for",
       "over",
       "about"
-     ]
+     ],
+     "verb": "see"
+    },
+    {
+     "particle": "off",
+     "meaning": "to cancel; to order to stop attacking",
+     "example": "They had to _____ the football match because of heavy rain.",
+     "options": [
+      "off",
+      "back",
+      "up",
+      "about"
+     ],
+     "verb": "call"
+    },
+    {
+     "particle": "back",
+     "meaning": "to return a phone call; to ask to return",
+     "example": "I'll _____ the client later this evening to discuss the arrangements.",
+     "options": [
+      "back",
+      "off",
+      "up",
+      "about"
+     ],
+     "verb": "call"
+    },
+    {
+     "particle": "up",
+     "meaning": "to telephone; to summon for military service",
+     "example": "Let me _____ my friend who's an expert in this field.",
+     "options": [
+      "up",
+      "off",
+      "back",
+      "about"
+     ],
+     "verb": "call"
+    },
+    {
+     "particle": "up",
+     "meaning": "to stop trying; to surrender",
+     "example": "Don't _____ trying - you can learn anything if you practice enough!",
+     "options": [
+      "up",
+      "away",
+      "in",
+      "off"
+     ],
+     "verb": "give"
+    },
+    {
+     "particle": "away",
+     "meaning": "to donate; to reveal a secret",
+     "example": "She decided to _____ her old clothes to charity.",
+     "options": [
+      "away",
+      "up",
+      "out",
+      "back"
+     ],
+     "verb": "give"
+    },
+    {
+     "particle": "out",
+     "meaning": "to understand or solve",
+     "example": "Can you help me _____ this math problem? I'm completely stuck.",
+     "options": [
+      "out",
+      "on",
+      "in",
+      "up"
+     ],
+     "verb": "figure"
+    },
+    {
+     "particle": "in",
+     "meaning": "to complete a form; to substitute; to inform",
+     "example": "Please _____ this application form and return it by Friday.",
+     "options": [
+      "in",
+      "out",
+      "up",
+      "with"
+     ],
+     "verb": "fill"
+    },
+    {
+     "particle": "up",
+     "meaning": "to establish; to arrange; to frame someone",
+     "example": "They're planning to _____ a new business in the city center.",
+     "options": [
+      "up",
+      "off",
+      "out",
+      "about"
+     ],
+     "verb": "set"
+    },
+    {
+     "particle": "off",
+     "meaning": "to begin a journey; to cause to explode; to enhance by contrast",
+     "example": "What time do you want to _____ for the airport tomorrow morning?",
+     "options": [
+      "off",
+      "up",
+      "out",
+      "about"
+     ],
+     "verb": "set"
+    },
+    {
+     "particle": "out",
+     "meaning": "to begin a journey; to intend; to arrange systematically",
+     "example": "We _____ to solve the mystery but found no evidence.",
+     "options": [
+      "out",
+      "up",
+      "off",
+      "about"
+     ],
+     "verb": "set"
+    },
+    {
+     "particle": "up",
+     "meaning": "to lift; to collect; to learn; to improve",
+     "example": "Can you _____ some milk from the shop on your way home?",
+     "options": [
+      "up",
+      "out",
+      "on",
+      "at"
+     ],
+     "verb": "pick"
+    },
+    {
+     "particle": "out",
+     "meaning": "to select or identify",
+     "example": "I couldn't _____ my sister from all the people in the crowd.",
+     "options": [
+      "out",
+      "up",
+      "on",
+      "off"
+     ],
+     "verb": "pick"
+    },
+    {
+     "particle": "off",
+     "meaning": "to deliver; to fall asleep; to decrease",
+     "example": "I'll _____ the kids at school at 8am tomorrow morning.",
+     "options": [
+      "off",
+      "in",
+      "out",
+      "by"
+     ],
+     "verb": "drop"
     }
    ]
   }
