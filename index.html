@@ -107,6 +107,11 @@
   .vtab.score-great::after  { background:#7dd3fc; opacity:1; }
   .vtab.score-ok::after     { background:#fb923c; opacity:1; }
   .vtab.score-poor::after   { background:var(--wrong); opacity:1; }
+  /* Practice sets draw from everything, so they read as a different kind of
+     thing: no set colour, a quieter face, and a rule before them. */
+  .vtab.practice{ font-family:'DM Mono',monospace; font-weight:400; letter-spacing:.1em; }
+  .vtab.practice.active{ color:var(--mode-accent); border-color:var(--mode-accent); }
+  .tabdiv{ width:1px; height:14px; background:rgba(255,255,255,.14); margin:0 .35rem; flex-shrink:0; }
 
   /* ── STAGE + CARD — same frame the quiz uses ── */
   .stage{
@@ -297,9 +302,6 @@
       <div class="stagebar" id="stagebar"></div>
       <div class="stagecaption" id="stagecaption"></div>
 
-      <div class="sectiontitle">Revision — every set shuffled together</div>
-      <div class="mixgrid" id="revgrid"></div>
-
       <div class="trialcard locked" id="trialcard">
         <svg class="icon" viewBox="0 0 24 24"><path id="trialIconPath" d="M2 18l3-11 5 4 4-7 4 7 5-4 3 11H2z" fill="#5a5a52"/></svg>
         <div>
@@ -381,7 +383,7 @@ const REST_SPAWNS     = 20;   // spawns before a rested phrase returns
 const ROUND_SECONDS   = 120;
 const CLEAR_THRESHOLD = 0.60;
 const TRIAL_THRESHOLD = 0.75;
-const N_REVISION      = 5;
+const N_PRACTICE      = 4;
 
 const STAGES = [
   { key:'spark', label:'Spark', color:'var(--s0)', glow:'var(--s0-glow)', desc:'You can spot a phrasal verb when you see one. First sets cleared.' },
@@ -399,7 +401,7 @@ const pick = a => a[(Math.random()*a.length)|0];
 const shuffle = a => { const b=[...a]; for(let i=b.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[b[i],b[j]]=[b[j],b[i]];} return b; };
 
 /* ---------- state filled on load ---------- */
-let GROUPS = [], FULL_POOL = [], REVISION_MIXES = [], THRESH = [], N_GROUPS = 0;
+let GROUPS = [], FULL_POOL = [], PRACTICE_SETS = [], THRESH = [], N_GROUPS = 0;
 
 /* ======================================================================
    LOAD
@@ -447,8 +449,8 @@ async function boot(){
   for (let row = 0; interleaved.length < FULL_POOL.length; row++) {
     GROUPS.forEach(g => { if (g.items[row]) interleaved.push(g.items[row]); });
   }
-  const size = Math.ceil(interleaved.length / N_REVISION);
-  for (let i = 0; i < interleaved.length; i += size) REVISION_MIXES.push(interleaved.slice(i, i + size));
+  const size = Math.ceil(interleaved.length / N_PRACTICE);
+  for (let i = 0; i < interleaved.length; i += size) PRACTICE_SETS.push(interleaved.slice(i, i + size));
 
   const s2 = Math.max(1, Math.ceil(N_GROUPS*0.2));
   const s3 = Math.max(s2+1, Math.ceil(N_GROUPS*0.45));
@@ -472,9 +474,9 @@ function makeStore(key){
   };
 }
 const store = makeStore('incoming.progress.v3');
-let progress = store.read() || { groupResults:{}, revResults:{}, phraseStats:{}, trialPassed:false, trialBest:0 };
+let progress = store.read() || { groupResults:{}, practiceResults:{}, phraseStats:{}, trialPassed:false, trialBest:0 };
 progress.groupResults = progress.groupResults || {};
-progress.revResults   = progress.revResults   || {};
+progress.practiceResults   = progress.practiceResults   || {};
 progress.phraseStats  = progress.phraseStats  || {};
 const save = () => store.write(progress);
 const pstat = p => (progress.phraseStats[p] = progress.phraseStats[p] || { hits:0, misses:0 });
@@ -542,20 +544,6 @@ function renderMenu(){
 
   buildTabs();
 
-  const rgrid = $('revgrid'); rgrid.innerHTML = '';
-  REVISION_MIXES.forEach((mix,i) => {
-    const res = progress.revResults[i];
-    const card = document.createElement('div');
-    card.className = 'mixcard';
-    card.innerHTML = `
-      <span class="num">REVISION ${i+1}</span>
-      <span class="name">${mix.length} phrases</span>
-      <span class="stars">${res ? starsFor(res.bestAccuracy) : ''}</span>
-      ${res ? `<span class="pct">best ${Math.round(res.bestAccuracy*100)}%</span>` : ''}`;
-    card.onclick = () => startRevision(i);
-    rgrid.appendChild(card);
-  });
-
   const all = cleared >= N_GROUPS;
   const tc = $('trialcard');
   tc.classList.toggle('locked', !all);
@@ -582,9 +570,21 @@ function tabStateClass(g){
   return ' score-poor';
 }
 
+function practiceStateClass(i){
+  const res = progress.practiceResults[i];
+  if (!res) return '';
+  if (res.bestAccuracy >= 0.9) return ' score-perfect';
+  if (res.bestAccuracy >= 0.7) return ' score-great';
+  if (res.bestAccuracy >= CLEAR_THRESHOLD) return ' score-ok';
+  return ' score-poor';
+}
+
+/* One row: the taught sets, a hairline, then the mixed practice sets. The
+   whole course is visible at a glance without opening anything. */
 function buildTabs(){
   const wrap = $('verbTabs');
   wrap.innerHTML = '';
+
   GROUPS.forEach(g => {
     const btn = document.createElement('button');
     btn.className = 'vtab' + tabStateClass(g) + (g.id === activeGroupId ? ' active' : '');
@@ -594,6 +594,20 @@ function buildTabs(){
     btn.onclick = () => { stopRound(); startGroup(g.id); };
     wrap.appendChild(btn);
   });
+
+  const div = document.createElement('span');
+  div.className = 'tabdiv';
+  wrap.appendChild(div);
+
+  PRACTICE_SETS.forEach((set, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'vtab practice' + practiceStateClass(i) + (activeGroupId === 'p'+i ? ' active' : '');
+    btn.textContent = 'PRACTICE ' + (i+1);
+    btn.title = `${set.length} phrases, drawn from every set`;
+    btn.onclick = () => { stopRound(); startPractice(i); };
+    wrap.appendChild(btn);
+  });
+
   const on = wrap.querySelector('.vtab.active');
   if (on) on.scrollIntoView({ inline:'center', block:'nearest' });
 }
@@ -609,8 +623,10 @@ function startGroup(id){
   buildTabs();
   beginRound({ mode:'group', index:id, pool:g.items, label:`${g.label} · match this meaning`, accent:g.color });
 }
-function startRevision(i){
-  beginRound({ mode:'revision', index:i, pool:REVISION_MIXES[i], label:`REVISION ${i+1} · match this meaning`, accent:'var(--gold)' });
+function startPractice(i){
+  activeGroupId = 'p' + i;
+  buildTabs();
+  beginRound({ mode:'practice', index:i, pool:PRACTICE_SETS[i], label:`PRACTICE ${i+1} · match this meaning`, accent:'var(--gold)' });
 }
 function startTrial(){
   /* Weighted toward phrases this learner has actually missed — the trial is
@@ -905,13 +921,13 @@ function endRound(){
     progress.groupResults[round.index] = {
       cleared: cleared || !!(prev && prev.cleared),
       bestAccuracy: Math.max(accuracy, prev ? prev.bestAccuracy : 0), coverage };
-  } else if (round.mode === 'revision'){
+  } else if (round.mode === 'practice'){
     /* Revision feeds phraseStats — so mastery marks and the trial's weighting
        see the practice — but does not move the stage ladder. The Crown stays
        tied to clearing the sets themselves. */
     cleared = accuracy >= CLEAR_THRESHOLD;
-    const prev = progress.revResults[round.index];
-    progress.revResults[round.index] = {
+    const prev = progress.practiceResults[round.index];
+    progress.practiceResults[round.index] = {
       cleared: cleared || !!(prev && prev.cleared),
       bestAccuracy: Math.max(accuracy, prev ? prev.bestAccuracy : 0), coverage };
   } else {
@@ -930,7 +946,7 @@ function renderSummary(res){
   showScreen('summary');
   const g = round.mode === 'group' ? GROUPS.find(x => x.id === round.index) : null;
   $('sumEyebrow').textContent = round.mode === 'trial' ? 'FINAL TRIAL'
-    : round.mode === 'revision' ? `REVISION ${round.index+1}` : g.label;
+    : round.mode === 'practice' ? `PRACTICE ${round.index+1}` : g.label;
 
   const v = $('sumVerdict');
   v.textContent = round.mode === 'trial'
@@ -951,7 +967,7 @@ function renderSummary(res){
 
   $('sumRetry').onclick = () => {
     if (round.mode === 'trial') startTrial();
-    else if (round.mode === 'revision') startRevision(round.index);
+    else if (round.mode === 'practice') startPractice(round.index);
     else startGroup(round.index);
   };
   $('sumNext').onclick = renderMenu;
